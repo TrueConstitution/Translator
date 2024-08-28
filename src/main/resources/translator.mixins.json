@@ -1,0 +1,24 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "kgg.translator.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "DrawContextMixin",
+    "ScreenMixin",
+    "screen.BookEditScreenMixin",
+    "world.EntityRendererMixin",
+    "world.SignBlockEntityRendererMixin",
+    "world.TextDisplayEntityRendererMixin"
+  ],
+  "client": [
+    "hud.BossBarHudMixin",
+    "hud.ChatHudMixin",
+    "hud.InGameHudForScoreboardMixin",
+    "hud.InGameHudForTitleMixin",
+    "screen.BookScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

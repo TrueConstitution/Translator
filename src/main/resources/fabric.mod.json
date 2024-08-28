@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "translator",
+  "version": "${version}",
+  "name": "Translator",
+  "description": "",
+  "authors": [],
+  "contact": {
+    "repo": "https://github.com/KGG/Translator"
+  },
+  "license": "All-Rights-Reserved",
+  "icon": "assets/translator/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "kgg.translator.TranslatorMod"
+    ]
+  },
+  "mixins": [
+    "translator.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  },
+  "accessWidener" : "translator.accesswidener"
+}
