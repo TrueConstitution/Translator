@@ -1,6 +1,8 @@
 package kgg.translator.util;
 
+import com.google.gson.Gson;
 import com.mojang.authlib.HttpAuthenticationService;
+import net.minecraft.client.realms.util.JsonUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,6 +17,7 @@ import java.util.UUID;
 
 public class RequestUtil {
     private static final HttpClient CLIENT = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
+    private static final Gson GSON = new Gson();
 
     // TODO: 2024/8/28 Url类参数
 
@@ -22,8 +25,16 @@ public class RequestUtil {
      * 用get方法请求
      */
     public static String get(String url, Map<String, Object> params) throws IOException {
-        URL url1 = HttpAuthenticationService.concatenateURL(new URL(url), HttpAuthenticationService.buildQuery(params));
-        HttpRequest request = HttpRequest.newBuilder(URI.create(url1.toString())).GET().build();
+        URI uri = URI.create(HttpAuthenticationService.concatenateURL(new URL(url), HttpAuthenticationService.buildQuery(params)).toString());
+        HttpRequest request = HttpRequest.newBuilder(uri).GET().build();
+        return send(request, HttpResponse.BodyHandlers.ofString()).body();
+    }
+
+    public static String postJson(String url, Map<String, Object> params) throws IOException {
+        HttpRequest request = HttpRequest.newBuilder(URI.create(url))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(params)))
+                .build();
         return send(request, HttpResponse.BodyHandlers.ofString()).body();
     }
 
@@ -31,8 +42,7 @@ public class RequestUtil {
      * 用post方法请求，附带文件
      */
     public static String postFile(String url, Map<String, Object> params, byte[] fileData, String name) throws IOException {
-        URL url1 = HttpAuthenticationService.concatenateURL(new URL(url), HttpAuthenticationService.buildQuery(params));
-
+        URI uri = URI.create(HttpAuthenticationService.concatenateURL(new URL(url), HttpAuthenticationService.buildQuery(params)).toString());
         // 构建请求体
         String boundary = UUID.randomUUID().toString();
         ByteArrayOutputStream bodyOutputStream = new ByteArrayOutputStream();
@@ -43,8 +53,7 @@ public class RequestUtil {
         bodyOutputStream.write("\r\n".getBytes(StandardCharsets.UTF_8));
         bodyOutputStream.write(("--" + boundary + "--\r\n").getBytes(StandardCharsets.UTF_8));
         // 请求
-
-        HttpRequest request = HttpRequest.newBuilder(URI.create(url1.toString()))
+        HttpRequest request = HttpRequest.newBuilder(uri)
                 .header("Content-Type", "multipart/form-data; boundary=" + boundary)
                 .POST(HttpRequest.BodyPublishers.ofByteArray(bodyOutputStream.toByteArray()))
                 .build();

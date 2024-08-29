@@ -1,7 +1,7 @@
-package kgg.translator.config;
+package kgg.translator;
 
 import com.google.gson.*;
-import kgg.translator.TranslatorManager;
+import kgg.translator.config.Option;
 import kgg.translator.util.ConfigUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,10 +40,6 @@ public class TranslatorConfig {
     }
 
     public static boolean write(JsonObject config) {
-//        config.addProperty("autoChatHud", Option.isAutoChatHud());
-//        config.addProperty("addChatHudTip", Option.isAddChatHudTip());
-//        config.addProperty("autoToolTip", Option.isAutoToolTip());
-//        config.addProperty("autoScreenText", Option.isAutoScreenText());
         Option.getOptions().forEach(option -> {
             if (option.isEnable() != option.defaultValue) {
                 config.addProperty(option.name, option.isEnable());
@@ -66,17 +62,13 @@ public class TranslatorConfig {
 
     public static boolean read(JsonObject config) {
         try {
-//            Option.setAutoChatHud(config.get("autoChatHud").getAsBoolean());
-//            Option.setAddChatHudTip(config.get("addChatHudTip").getAsBoolean());
-//            Option.setAutoToolTip(config.get("autoToolTip").getAsBoolean());
-//            Option.setAutoScreenText(config.get("autoScreenText").getAsBoolean());
             Option.getOptions().forEach(option -> {
                 JsonElement element = config.get(option.name);
                 if (element != null) {
                     option.setEnable(element.getAsBoolean());
                 }
             });
-//
+
             TranslatorManager.setDefaultFrom(config.get("defaultFrom").getAsString());
             TranslatorManager.setDefaultTo(config.get("defaultTo").getAsString());
 

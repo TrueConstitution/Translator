@@ -1,6 +1,5 @@
 {
-    "key.translator.translate_screen": "Translate",
-    "key.translator.translate_world": "Translate",
-    "key.categories.translator": "Translator",
+    "key.categories.translator": "translator",
+    "key.translator.options": "options screen",
     "key.translator.ocr": "ocr"
 }

@@ -1,7 +1,7 @@
 package kgg.translator.mixin.world;
 
 import kgg.translator.handler.TranslateHelper;
-import kgg.translator.handler.WorldOptions;
+import kgg.translator.config.WorldOptions;
 import net.minecraft.block.entity.SignText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
@@ -17,7 +17,6 @@ import java.util.function.Function;
 public abstract class SignTextMixin {
     @Shadow @Nullable public OrderedText[] orderedMessages;
     @Shadow private boolean filtered;
-
     @Shadow public abstract Text getMessage(int line, boolean filtered);
 
     @Unique

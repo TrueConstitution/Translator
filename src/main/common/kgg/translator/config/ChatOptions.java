@@ -1,10 +1,8 @@
-package kgg.translator.handler.chathub;
-import kgg.translator.config.Option;
+package kgg.translator.config;
 
 public class ChatOptions {
     public static final Option chatTip = new Option("chat_tip", false);
-
     public static final Option autoChat = new Option("auto_chat", false);
 
-    public static void init() {}
+    public static void register() {}
 }

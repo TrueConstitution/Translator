@@ -1,7 +1,7 @@
 package kgg.translator.mixin.world;
 
 import kgg.translator.handler.TranslateHelper;
-import kgg.translator.handler.WorldOptions;
+import kgg.translator.config.WorldOptions;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;

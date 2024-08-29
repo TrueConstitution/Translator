@@ -1,6 +1,7 @@
 package kgg.translator.handler;
 
 import kgg.translator.TranslatorManager;
+import kgg.translator.config.ScreenOptions;
 import kgg.translator.exception.TranslateException;
 import kgg.translator.util.StringUtil;
 import kgg.translator.util.TextUtil;
@@ -9,8 +10,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableTextContent;
-import net.minecraft.util.Language;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -67,12 +66,6 @@ public class TooltipHandler {
 
                         CompletableFuture.supplyAsync(() -> {
                             // 如果有翻译，则直接添加
-//                            TranslatableTextContent content = TextUtil.getOnlyTranslatableText(finalT);
-//                            if (content != null) {
-//                                if (Language.getInstance().hasTranslation(content.getKey())) {
-//                                    return string;
-//                                }
-//                            }
                             if (TextUtil.isSystemText(finalT)) {
                                 return string;
                             }

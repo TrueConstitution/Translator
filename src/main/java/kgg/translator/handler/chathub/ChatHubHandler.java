@@ -1,6 +1,7 @@
 package kgg.translator.handler.chathub;
 
 import kgg.translator.TranslatorManager;
+import kgg.translator.config.ChatOptions;
 import kgg.translator.exception.TranslateException;
 import kgg.translator.util.StringUtil;
 import kgg.translator.util.TextUtil;

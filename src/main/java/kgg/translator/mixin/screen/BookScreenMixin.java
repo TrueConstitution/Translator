@@ -27,7 +27,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Mixin(BookScreen.class)
 public class BookScreenMixin extends Screen {
     @Shadow private List<OrderedText> cachedPage;
-    @Shadow private int cachedPageIndex;
     @Shadow @Final protected static int MAX_TEXT_WIDTH;
     @Unique
     ButtonWidget translateButton;

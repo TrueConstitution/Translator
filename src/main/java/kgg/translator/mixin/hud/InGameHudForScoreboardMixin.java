@@ -1,6 +1,6 @@
 package kgg.translator.mixin.hud;
 
-import kgg.translator.handler.ScreenOptions;
+import kgg.translator.config.ScreenOptions;
 import kgg.translator.handler.TranslateHelper;
 import kgg.translator.util.SidebarEntry1;
 import net.minecraft.client.MinecraftClient;

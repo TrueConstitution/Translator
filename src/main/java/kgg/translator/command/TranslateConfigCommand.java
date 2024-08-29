@@ -8,7 +8,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import kgg.translator.config.Option;
-import kgg.translator.config.TranslatorConfig;
+import kgg.translator.TranslatorConfig;
 import kgg.translator.TranslatorManager;
 import kgg.translator.handler.TranslateHelper;
 import kgg.translator.translator.Translator;
@@ -75,7 +75,7 @@ public class TranslateConfigCommand {
                                 String json = StringArgumentType.getString(context, "json");
                                 JsonObject object = (JsonObject) JsonParser.parseString(json);
                                 boolean read = TranslatorConfig.read(object);
-                                assert read;
+                                if (!read) throw new Exception();
                                 context.getSource().sendFeedback(Text.literal("OK"));
                             } catch (Exception e) {
                                 context.getSource().sendError(Text.literal("Failed to load config"));

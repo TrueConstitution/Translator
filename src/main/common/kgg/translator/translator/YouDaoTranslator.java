@@ -1,7 +1,6 @@
 package kgg.translator.translator;
 
 import com.google.common.hash.Hashing;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import kgg.translator.exception.TranslateException;
@@ -20,10 +19,7 @@ public abstract class YouDaoTranslator extends Translator {
 
     @Override
     public synchronized String translate(String text, String from, String to) throws IOException {
-        System.out.println(text);
-        delay(800);  // 预防207重放请求
-        try {
-            // 构建参数
+        return delay(800, () -> {
             String curTime = String.valueOf(System.currentTimeMillis() / 1000);
             String input = text.length() > 20 ? text.substring(0, 10) + text.length() + text.substring(text.length() - 10) : text;
             String sign = Hashing.sha256().hashString(appKey + input + curTime + curTime + appSecret, StandardCharsets.UTF_8).toString();
@@ -47,9 +43,7 @@ public abstract class YouDaoTranslator extends Translator {
                 throw new TranslateException(errorCode);
             }
             return object.get("translation").getAsString();
-        } finally {
-            unlock();
-        }
+        });
     }
 
     // TODO: 2024/8/28 有道

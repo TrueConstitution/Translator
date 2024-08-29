@@ -26,8 +26,7 @@ public abstract class BaiduTranslator extends Translator implements CommandConfi
 
     @Override
     public synchronized String translate(String text, String from, String to) throws IOException {
-        delay(delayTime);
-        try {
+        return delay(delayTime, () -> {
             String salt = String.valueOf(System.currentTimeMillis());
             Map<String, Object> params = Map.of(
                     "q", text,
@@ -51,9 +50,7 @@ public abstract class BaiduTranslator extends Translator implements CommandConfi
             }
 
             return joiner.toString();
-        } finally {
-            unlock();
-        }
+        });
     }
 
     @Override

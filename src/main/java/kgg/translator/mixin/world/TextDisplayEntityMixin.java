@@ -1,9 +1,8 @@
 package kgg.translator.mixin.world;
 
 import kgg.translator.handler.TranslateHelper;
-import kgg.translator.handler.WorldOptions;
+import kgg.translator.config.WorldOptions;
 import net.minecraft.entity.decoration.DisplayEntity;
-import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

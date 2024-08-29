@@ -1,16 +1,15 @@
-package kgg.translator.handler;
+package kgg.translator.config;
 
-import kgg.translator.config.Option;
-
-public class WorldOptions {
-    public static final Option autoEntityName = new Option("auto_entity_name", false);
-    public static final Option autoSign = new Option("auto_sign", false);
-    public static void init() {}
-//    private static final Logger LOGGER = LogManager.getLogger(WorldOptions.class);
+public class ScreenOptions {
+    public static final Option autoTooltip = new Option("auto_tip", false);
+    public static final Option autoTitle = new Option("auto_title", false);
+    public static final Option autoScoreboard = new Option("auto_scoreboard", false);
+    public static final Option autoBossBar = new Option("auto_boss_bar", false);
+//
 //
 //
 //    // 缓存翻译结果，1分钟刷新一次，翻译的结果在管理器中还有一次缓存，所以不会重复请求，只会重新请求失败的结果
-//    private static final LoadingCache<String, String> cache = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).maximumSize(600).build(new CacheLoader<>() {
+//    private static final LoadingCache<String, String> cache = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).maximumSize(200).build(new CacheLoader<>() {
 //        @Override
 //        public @NotNull String load(@NotNull String key) throws Exception {
 //            return translate(key);
@@ -27,25 +26,20 @@ public class WorldOptions {
 //    }
 //
 //    public static Text getTranslateText(Text text) {
-//        return getTranslateText(text, t -> {});
-//    }
-//
-//    public static Text getTranslateText(Text text, Consumer<String> comparable) {
-
-//        if (Option.isAutoWorldText()) {
+//        if (Option.isAutoScreenText()) {
 //            if (TextUtil.getOnlyTranslateText(text) == null) {
 //                String string = text.getString();
 //                String c = cache.getIfPresent(string);
 //                if (c != null) {
 //                    return Text.literal(c).fillStyle(text.getStyle());
 //                } else {
-//                    CompletableFuture.supplyAsync(() -> {
+//                    CompletableFuture.runAsync(() -> {
 //                        try {
-//                            return cache.get(string);
+//                            cache.get(string);
 //                        } catch (ExecutionException e) {
 //                            throw new RuntimeException(e);
 //                        }
-//                    }).thenAccept(comparable);
+//                    });
 //                }
 //            }
 //        }
@@ -56,4 +50,6 @@ public class WorldOptions {
 //        LOGGER.info("Clear cache");
 //        cache.invalidateAll();
 //    }
+
+    public static void register() {}
 }
