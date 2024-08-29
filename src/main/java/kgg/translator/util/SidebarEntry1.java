@@ -1,4 +1,4 @@
-package kgg.translator.handler;
+package kgg.translator.util;
 
 import net.minecraft.text.Text;
 

@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Mixin(DrawContext.class)
-public abstract class DrawContextMixin {
+public abstract class DrawContextMixinForTooltip {
 
     @Shadow @Deprecated public abstract void draw(Runnable drawCallback);
 
@@ -49,8 +49,8 @@ public abstract class DrawContextMixin {
 
     @Inject(method = "drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;IILnet/minecraft/client/gui/tooltip/TooltipPositioner;)V", at = @At("HEAD"))
     public void drawTooltip(TextRenderer textRenderer, List<Text> text, int x, int y, TooltipPositioner positioner, CallbackInfo ci) {
-        DrawContextMixin.textRenderer = textRenderer;
-        DrawContextMixin.positioner = positioner;
+        DrawContextMixinForTooltip.textRenderer = textRenderer;
+        DrawContextMixinForTooltip.positioner = positioner;
     }
 
 

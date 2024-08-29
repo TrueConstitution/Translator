@@ -1,9 +1,9 @@
 package kgg.translator.handler.chathub;
 
-import kgg.translator.Options;
 import kgg.translator.TranslatorManager;
-import kgg.translator.util.StringUtil;
 import kgg.translator.exception.TranslateException;
+import kgg.translator.util.StringUtil;
+import kgg.translator.util.TextUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.*;
 import org.apache.logging.log4j.LogManager;
@@ -16,18 +16,21 @@ public class ChatHubHandler {
     private static final Logger LOGGER = LogManager.getLogger(ChatHubHandler.class);
 
     public static void preHandle(MutableText text) {
+        if (TextUtil.isSystemText(text)) {
+            return;
+        }
         if (StringUtil.isBlank(text.getString())) {  // 不翻译空行
             return;
         }
-        if (Options.isAddChatHudTip()) {  // 添加翻译提示
+        if (ChatOptions.chatTip.isEnable()) {  // 添加翻译提示
             text.siblings = new ArrayList<>(text.siblings);
             text.append(" ").append(Text.literal("[翻译]").setStyle(Style.EMPTY
                     .withColor(TextColor.fromRgb(65522))
                     .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("点击翻译")))
                     .withClickEvent(new TranslateClickEvent(text))));
         }
-        if (Options.isAutoChatHud()) {  // 如果是自动翻译则处理
-            if (Options.isAddChatHudTip()) {
+        if (ChatOptions.autoChat.isEnable()) {  // 如果是自动翻译则处理
+            if (ChatOptions.chatTip.isEnable()) {
                 handleWithTranslatingTip(text);
             } else {
                 handle(text);
@@ -39,6 +42,8 @@ public class ChatHubHandler {
 
     public static void handleWithTranslatingTip(MutableText text) {
         text.siblings.remove(text.siblings.size() - 1);  // 移除翻译提示
+//        System.out.println(text.toString() + TextUtil.hasLanguage(TextUtil.getOnlyTranslatableText(text)) + TextUtil.getOnlyTranslatableText(text));
+
         String s = StringUtil.strip(text.getString());
         text.siblings.add(TRANSLATING_TIP);  // 添加翻译中提示
         MinecraftClient.getInstance().inGameHud.getChatHud().refresh();
@@ -56,12 +61,13 @@ public class ChatHubHandler {
             text.siblings.set(text.siblings.size() - 1, createErrorText(err, text));
             return null;
         }).handle((unused, throwable) -> {
-            MinecraftClient.getInstance().inGameHud.getChatHud().refresh();
+            MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().inGameHud.getChatHud().refresh());
             return null;
         });
     }
 
     public static void handle(MutableText text) {
+
         String s = StringUtil.strip(text.getString());
         // 请求
         CompletableFuture.runAsync(() -> {
@@ -76,7 +82,7 @@ public class ChatHubHandler {
             text.append(" ").append(createErrorText(err, text));
             return null;
         }).handle((unused, throwable) -> {
-            MinecraftClient.getInstance().inGameHud.getChatHud().refresh();
+            MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().inGameHud.getChatHud().refresh());
             return null;
         });
     }

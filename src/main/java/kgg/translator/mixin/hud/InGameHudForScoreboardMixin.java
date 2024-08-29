@@ -1,7 +1,8 @@
 package kgg.translator.mixin.hud;
 
-import kgg.translator.handler.ScreenTextHandler;
-import kgg.translator.handler.SidebarEntry1;
+import kgg.translator.handler.ScreenOptions;
+import kgg.translator.handler.TranslateHelper;
+import kgg.translator.util.SidebarEntry1;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -59,8 +60,10 @@ public abstract class InGameHudForScoreboardMixin {
                     MutableText text3 = scoreboardEntry.formatted(numberFormat);
 
                     // 翻译
-                    text2 = (MutableText) ScreenTextHandler.getTranslateText(text2);
-                    text3 = (MutableText) ScreenTextHandler.getTranslateText(text3);
+                    if (ScreenOptions.autoScoreboard.isEnable()) {
+                        text2 = (MutableText) TranslateHelper.translateNoWait(text2);
+                    }
+//                    text3 = (MutableText) ScreenOptions.getTranslateText(text3);
 
                     int scoreWidth = this.getTextRenderer().getWidth(text3);
                     return new SidebarEntry1(text2, text3, scoreWidth);
@@ -70,7 +73,10 @@ public abstract class InGameHudForScoreboardMixin {
         Text text = objective.getDisplayName();
 
         // 翻译
-        text = ScreenTextHandler.getTranslateText(text);
+        if (ScreenOptions.autoScoreboard.isEnable()) {
+
+            text = TranslateHelper.translateNoWait(text);
+        }
 
         int textWidth = this.getTextRenderer().getWidth(text);
         int joinerWidth = this.getTextRenderer().getWidth(SCOREBOARD_JOINER);

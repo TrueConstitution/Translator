@@ -14,7 +14,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -39,10 +38,8 @@ public class TranslatorManager {
     }
 
     public static ResRegion[] ocrtrans(byte[] img) throws TranslateException {
-        return ocrtrans(img, getDefaultFrom(), getDefaultTo());
+        return ocrtrans(getCurrentTranslator(), img, getDefaultFrom(), getDefaultTo());
     }
-
-    // TODO: 2024/8/28 使用固定线程池
 
     public static String cachedTranslate(String text) throws TranslateException {
         try {
@@ -55,25 +52,25 @@ public class TranslatorManager {
             }
         }
     }
-    public static String translate(String text) throws TranslateException {
-        return translate(text, getCurrentTranslator());
+    private static String translate(String text) throws TranslateException {
+        return translate(text, getCurrentTranslator(), getDefaultFrom(), getDefaultTo());
     }
 
-    // TODO: 2024/8/28 getDefaultFrom赋值
-    public static String translate(String text, Translator translator) throws TranslateException {
-//        LOGGER.info("Use {} translate {}, from {} to {}", translator, text, getDefaultFrom(), getDefaultTo());
+    private static String translate(String text, Translator translator) throws TranslateException {
+        return translate(text, translator, getDefaultFrom(), getDefaultTo());
+    }
+
+    private static String translate(String text, Translator translator, String from, String to) throws TranslateException {
         if (StringUtil.isBlank(text)) return text;
         if (StringUtils.isNumeric(text)) return text;
+        checkTranslator(translator);
 
-        checkCurrentTranslator();
-        String defaultTo1 = getDefaultTo();
-        String defaultFrom1 = getDefaultFrom();
         try {
-            String translate = translator.translate(text, defaultFrom1, defaultTo1);
-            LOGGER.info("Translate: \"{}\" -> \"{}\"", getOutString(text), getOutString(translate));
+            String translate = translator.translate(text, from, to);
+            LOGGER.info("{} translate from {} to {}: \"{}\" -> \"{}\"", translator, getOutString(text), getOutString(translate), from, to);
             return translate;
         } catch (Exception e) {
-            LOGGER.error("Translate \"{}\" failed:", getOutString(text), e);
+            LOGGER.error("{} translate from {} to {} failed: \"{}\"", translator, from, to, getOutString(text), e);
             if (e instanceof TranslateException c) {
                 throw c;
             } else {
@@ -82,15 +79,13 @@ public class TranslatorManager {
         }
     }
 
-    // TODO: 2024/8/28 详细的日志
-    public static ResRegion[] ocrtrans(byte[] img, String from, String to) throws TranslateException {
-        checkCurrentTranslator();
-        Translator translator = getCurrentTranslator();
-        LOGGER.info("Use {} ocrtrans, from {} to {}", translator, from, to);
+    private static ResRegion[] ocrtrans(Translator translator, byte[] img, String from, String to) throws TranslateException {
+        checkTranslator(translator);
+        LOGGER.info("{} ocrtrans, from {} to {}", translator, from, to);
         try {
             return translator.ocrtrans(img, from, to);
         } catch (Exception e) {
-            LOGGER.error("OCR failed:", e);
+            LOGGER.error("{} ocrtrans, from {} to {} failed:", translator, from, to, e);
             if (e instanceof TranslateException c) {
                 throw c;
             } else {
@@ -99,8 +94,7 @@ public class TranslatorManager {
         }
     }
 
-    private static void checkCurrentTranslator() throws TranslateException {
-        Translator translator = getCurrentTranslator();
+    private static void checkTranslator(Translator translator) throws TranslateException {
         if (translator == null) {
             throw new NoTranslatorSelectedException();
         }
@@ -121,9 +115,6 @@ public class TranslatorManager {
     public static boolean setCurrentTranslator(Translator translator) {
         LOGGER.info("Set current translator to {}", translator);
         boolean b = current != null && !current.equals(translator);
-        if (b) {
-            CacheManager.clearCache();
-        }
         TranslatorManager.current = translator;
         return b;
     }
@@ -145,9 +136,6 @@ public class TranslatorManager {
     }
 
     public static void setDefaultTo(String defaultTo) {
-        if (!TranslatorManager.defaultTo.equals(defaultTo)) {
-            CacheManager.clearCache();
-        }
         TranslatorManager.defaultTo = defaultTo;
     }
 
@@ -156,9 +144,6 @@ public class TranslatorManager {
     }
 
     public static void setDefaultFrom(String defaultFrom) {
-        if (!TranslatorManager.defaultFrom.equals(defaultFrom)) {
-            CacheManager.clearCache();
-        }
         TranslatorManager.defaultFrom = defaultFrom;
     }
 

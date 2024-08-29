@@ -2,6 +2,7 @@ package kgg.translator.mixin.screen;
 
 import kgg.translator.TranslatorManager;
 import kgg.translator.exception.TranslateException;
+import kgg.translator.util.TextUtil;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.BookScreen;
@@ -19,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -42,14 +44,10 @@ public class BookScreenMixin extends Screen {
         translateButton = addDrawableChild(ButtonWidget.builder(Text.literal("翻译"), button -> {
             CompletableFuture.runAsync(() -> {
                 try {
-                    StringBuilder sb = new StringBuilder();
-                    OrderedText orderedText = cachedPage.get(cachedPageIndex);
-                    orderedText.accept((index, style, codePoint) -> {
-                        sb.appendCodePoint(codePoint);
-                        return true;
-                    });
+                    StringJoiner sb = new StringJoiner(" ");
+                    cachedPage.forEach(text -> sb.add(TextUtil.getString(text)));
 
-                    translateText = TranslatorManager.translate(sb.toString());
+                    translateText = TranslatorManager.cachedTranslate(sb.toString());
                 } catch (TranslateException ignored) {
                     translateText = "翻译失败";
                 }

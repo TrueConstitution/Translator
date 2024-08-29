@@ -2,7 +2,10 @@ package kgg.translator;
 
 import kgg.translator.command.TranslateCommand;
 import kgg.translator.command.TranslateConfigCommand;
-import kgg.translator.command.TranslateConfigEasyCommand;
+import kgg.translator.config.TranslatorConfig;
+import kgg.translator.handler.ScreenOptions;
+import kgg.translator.handler.WorldOptions;
+import kgg.translator.handler.chathub.ChatOptions;
 import kgg.translator.translator.BaiduTranslatorImpl;
 import kgg.translator.translator.YouDaoTranslatorImpl;
 import net.fabricmc.api.ClientModInitializer;
@@ -15,8 +18,12 @@ public class TranslatorMod implements ClientModInitializer {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             TranslateCommand.register(dispatcher);
             TranslateConfigCommand.register(dispatcher);
-            TranslateConfigEasyCommand.register(dispatcher);
+//            TranslateConfigEasyCommand.register(dispatcher);
         });
+
+        ChatOptions.init();
+        WorldOptions.init();
+        ScreenOptions.init();
 
         TranslatorManager.addTranslator(new YouDaoTranslatorImpl());
         TranslatorManager.addTranslator(new BaiduTranslatorImpl());

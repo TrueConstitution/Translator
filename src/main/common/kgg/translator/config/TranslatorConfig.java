@@ -1,6 +1,7 @@
-package kgg.translator;
+package kgg.translator.config;
 
 import com.google.gson.*;
+import kgg.translator.TranslatorManager;
 import kgg.translator.util.ConfigUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,10 +40,15 @@ public class TranslatorConfig {
     }
 
     public static boolean write(JsonObject config) {
-        config.addProperty("autoChatHud", Options.isAutoChatHud());
-        config.addProperty("addChatHudTip", Options.isAddChatHudTip());
-        config.addProperty("autoToolTip", Options.isAutoToolTip());
-        config.addProperty("autoScreenText", Options.isAutoScreenText());
+//        config.addProperty("autoChatHud", Option.isAutoChatHud());
+//        config.addProperty("addChatHudTip", Option.isAddChatHudTip());
+//        config.addProperty("autoToolTip", Option.isAutoToolTip());
+//        config.addProperty("autoScreenText", Option.isAutoScreenText());
+        Option.getOptions().forEach(option -> {
+            if (option.isEnable() != option.defaultValue) {
+                config.addProperty(option.name, option.isEnable());
+            }
+        });
 
         config.addProperty("defaultFrom", TranslatorManager.getDefaultFrom());
         config.addProperty("defaultTo", TranslatorManager.getDefaultTo());
@@ -59,13 +65,18 @@ public class TranslatorConfig {
     }
 
     public static boolean read(JsonObject config) {
-        // TODO: 2024/8/26 可读取一部分
         try {
-            Options.setAutoChatHud(config.get("autoChatHud").getAsBoolean());
-            Options.setAddChatHudTip(config.get("addChatHudTip").getAsBoolean());
-            Options.setAutoToolTip(config.get("autoToolTip").getAsBoolean());
-            Options.setAutoScreenText(config.get("autoScreenText").getAsBoolean());
-
+//            Option.setAutoChatHud(config.get("autoChatHud").getAsBoolean());
+//            Option.setAddChatHudTip(config.get("addChatHudTip").getAsBoolean());
+//            Option.setAutoToolTip(config.get("autoToolTip").getAsBoolean());
+//            Option.setAutoScreenText(config.get("autoScreenText").getAsBoolean());
+            Option.getOptions().forEach(option -> {
+                JsonElement element = config.get(option.name);
+                if (element != null) {
+                    option.setEnable(element.getAsBoolean());
+                }
+            });
+//
             TranslatorManager.setDefaultFrom(config.get("defaultFrom").getAsString());
             TranslatorManager.setDefaultTo(config.get("defaultTo").getAsString());
 

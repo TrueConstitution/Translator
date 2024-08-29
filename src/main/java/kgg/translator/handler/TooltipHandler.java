@@ -32,10 +32,15 @@ public class TooltipHandler {
     private static List<Text> lastText;  // 上一次
     private static int time = 0;  // 时间
 
+    // TODO: 2024/8/29 优化
     /**
      * 0.5秒后翻译文本
      */
     public static void preHandle(DrawContext drawContext, List<Text> text, int mouseX, int mouseY) {
+        if (!ScreenOptions.autoTooltip.isEnable()) {
+            return;
+        }
+
         if (!text.equals(lastText)) {
             time = 0;
             lastText = text;
@@ -62,11 +67,14 @@ public class TooltipHandler {
 
                         CompletableFuture.supplyAsync(() -> {
                             // 如果有翻译，则直接添加
-                            TranslatableTextContent content = TextUtil.getOnlyTranslateText(finalT);
-                            if (content != null) {
-                                if (Language.getInstance().hasTranslation(content.getKey())) {
-                                    return string;
-                                }
+//                            TranslatableTextContent content = TextUtil.getOnlyTranslatableText(finalT);
+//                            if (content != null) {
+//                                if (Language.getInstance().hasTranslation(content.getKey())) {
+//                                    return string;
+//                                }
+//                            }
+                            if (TextUtil.isSystemText(finalT)) {
+                                return string;
                             }
 
                             // 获取

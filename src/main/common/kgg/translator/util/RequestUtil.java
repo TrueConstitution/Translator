@@ -16,7 +16,7 @@ import java.util.UUID;
 public class RequestUtil {
     private static final HttpClient CLIENT = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
 
-    // TODO: 2024/8/27 简化
+    // TODO: 2024/8/28 Url类参数
 
     /**
      * 用get方法请求

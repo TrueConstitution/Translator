@@ -33,8 +33,6 @@ public class OcrHandler {
                     }).toArray(ResRegion[]::new);
                     screen.setResRegions(ocrtrans);
                 } catch (Exception e) {
-                    LOGGER.error("OCR failed:", e);
-                    // TODO: 2024/8/28 错误提示
                     screen.setResRegions(new ResRegion[0]);
                 }
             });

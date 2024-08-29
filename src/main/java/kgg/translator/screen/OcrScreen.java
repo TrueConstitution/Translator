@@ -31,6 +31,7 @@ public class OcrScreen extends Screen {
 
     private static final MutableText translatingText = Text.literal("翻译中");
     private static final MutableText esc = Text.literal("按Esc取消");
+    private static final MutableText error = Text.literal("没有识别到文字或识别错误");
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
 //        MatrixStack matrices = context.getMatrices();
@@ -38,12 +39,15 @@ public class OcrScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
         context.drawText(textRenderer, esc, width - textRenderer.getWidth(esc), height - textRenderer.fontHeight, 0xFFFFFF, true);
         if (resRegions == null) {
-//            renderBackground(context, mouseX, mouseY, delta);
             context.drawCenteredTextWithShadow(textRenderer, translatingText, width / 2, height / 2, 0xFFFFFF);
-//            context.drawText(textRenderer, translatingText, width / 2, height / 2, 0xFFFFFF, true);
+        } else if (resRegions.length == 0) {
+//            context.fill(0, 0, 880, 880, 0xffff0000);
+            context.drawCenteredTextWithShadow(textRenderer, error, width / 2, height / 2,  0xFF0000);
         } else {
             for (ResRegion resRegion : resRegions) {
-//                textRenderer.draw()
+//                ResRegion resRegion1 = resRegion.scale(1 / client.getWindow().getScaleFactor());
+                context.fill(resRegion.x(), resRegion.y(), resRegion.x() + resRegion.w(), resRegion.y() + resRegion.h(), 0x4cff7272);
+
                 // 蓝色
                 MatrixStack matrices = context.getMatrices();
                 matrices.push();
@@ -56,35 +60,34 @@ public class OcrScreen extends Screen {
                 float textX = (float) resRegion.x() + ((resRegion.w() - textWidth2) / 2);
                 float textY = (float) resRegion.y() + ((resRegion.h() - textHeight2) / 2);
 
-                context.fill(resRegion.x(), resRegion.y(), resRegion.x() + resRegion.w(), resRegion.y() + resRegion.h(), 0x59ffffff);
-
                 matrices.scale(scale, scale, scale);
-                context.drawText(textRenderer, resRegion.dst(), (int) (textX / scale), (int) (textY / scale), 0x26ff1b, true);
+                context.drawText(textRenderer, resRegion.dst(), (int) (textX / scale), (int) (textY / scale), 0x1bb7ff, true);
 
                 matrices.pop();
             }
         }
     }
 
+//    @Override
+//    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+//        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+//            this.client.setScreen(this.parent);
+//            return true;
+//        }
+//        return super.keyPressed(keyCode, scanCode, modifiers);
+//    }
+
+
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-            this.client.setScreen(this.parent);
-            return true;
-        }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+    public void close() {
+        this.client.setScreen(this.parent);
     }
 
     @Override
     public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
-        if (resRegions == null) {
+        if (resRegions == null || resRegions.length == 0) {
             super.renderBackground(context, mouseX, mouseY, 0.01f);
 
         }
-    }
-
-    @Override
-    public boolean shouldPause() {
-        return false;
     }
 }

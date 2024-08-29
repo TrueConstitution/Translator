@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(Screen.class)
-public class ScreenMixin {
+public class ScreenMixinForChat {
 
     /**
      * 在遇到奇怪的点击操作时，查看是不是翻译操作

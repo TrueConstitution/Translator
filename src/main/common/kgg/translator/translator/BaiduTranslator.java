@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 public abstract class BaiduTranslator extends Translator implements CommandConfigurable {
     public static final String URL = "https://fanyi-api.baidu.com/api/trans/vip/translate";
@@ -44,7 +45,12 @@ public abstract class BaiduTranslator extends Translator implements CommandConfi
             if (errorCode != null) {
                 throw new TranslateException(errorCode.getAsString());
             }
-            return object.get("trans_result").getAsJsonArray().get(0).getAsJsonObject().get("dst").getAsString();
+            StringJoiner joiner = new StringJoiner(" ");
+            for (JsonElement element : object.get("trans_result").getAsJsonArray()) {
+                joiner.add(element.getAsJsonObject().get("dst").getAsString());
+            }
+
+            return joiner.toString();
         } finally {
             unlock();
         }

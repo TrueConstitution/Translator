@@ -15,7 +15,7 @@ public class TranslateCommand {
                         .executes(context -> {
                             Text message;
                             try {
-                                String result = TranslatorManager.translate(StringArgumentType.getString(context, "text"));
+                                String result = TranslatorManager.cachedTranslate(StringArgumentType.getString(context, "text"));
                                 message = Text.literal(result);
                                 context.getSource().sendFeedback(message);
                             } catch (TranslateException e) {
