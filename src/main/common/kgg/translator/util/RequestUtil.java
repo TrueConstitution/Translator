@@ -1,8 +1,6 @@
 package kgg.translator.util;
 
-import com.google.gson.Gson;
 import com.mojang.authlib.HttpAuthenticationService;
-import net.minecraft.client.realms.util.JsonUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -17,7 +15,6 @@ import java.util.UUID;
 
 public class RequestUtil {
     private static final HttpClient CLIENT = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
-    private static final Gson GSON = new Gson();
 
     // TODO: 2024/8/28 Url类参数
 
@@ -30,13 +27,15 @@ public class RequestUtil {
         return send(request, HttpResponse.BodyHandlers.ofString()).body();
     }
 
-    public static String postJson(String url, Map<String, Object> params) throws IOException {
-        HttpRequest request = HttpRequest.newBuilder(URI.create(url))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(params)))
-                .build();
-        return send(request, HttpResponse.BodyHandlers.ofString()).body();
-    }
+//    public static String postForm(String url, Map<String, Object> params) throws IOException {
+////        URI uri = URI.create(HttpAuthenticationService.concatenateURL(new URL(url), HttpAuthenticationService.buildQuery(params)).toString());
+//
+//        HttpRequest request = HttpRequest.newBuilder(URI.create(url))
+//                .header("Content-Type", "application/x-www-form-urlencoded'")
+//                .POST(HttpRequest.BodyPublishers.ofString(HttpAuthenticationService.buildQuery(params)))
+//                .build();
+//        return send(request, HttpResponse.BodyHandlers.ofString()).body();
+//    }
 
     /**
      * 用post方法请求，附带文件
@@ -72,47 +71,3 @@ public class RequestUtil {
         return CLIENT;
     }
 }
-//    public static void main(String[] args) throws Exception {
-//        Path path = Path.of("C:/users/kgg/desktop/a.png");
-//        byte[] bytes = Files.readAllBytes(path);
-////        /*
-////        #     "from": "auto",
-////#     "to": "zh",
-////#     "appid": app_id,
-////#     "salt": "123",
-////#     "cuid": "APICUID",
-////#     "mac": "mac",
-////#     "version": 3,
-////#     "sign": sign
-////         */
-//        String appId = "20211003000963466";
-//        String appSecret = "f0qBNq6QOO37Ep6Y8j_6";
-//        HashFunction md5 = Hashing.md5();
-////
-//        String sign = (appId + md5.hashBytes(bytes) + "123" + "APICUID" + "mac" + appSecret);
-////        System.out.println(sign);
-////
-////
-//        String signMd5 = md5.hashString(sign, StandardCharsets.UTF_8).toString();
-////        System.out.println(signMd5);
-//        Map<String, Object> from = Map.of(
-//                "from", "auto",
-//                "to", "zh",
-//                "appid", appId,
-//                "salt", "123",
-//                "cuid", "APICUID",
-//                "mac", "mac",
-//                "version", 3,
-//                "sign", signMd5
-//        );
-////
-////        System.out.println(from);
-////
-//        System.out.println(postFile(BaiduTranslator.OCR_URL, from, bytes, "image"));
-////
-////
-////        // {'from': 'auto', 'to': 'zh', 'appid': '20211003000963466', 'salt': '123', 'cuid': 'APICUID', 'mac': 'mac', 'version': 3, 'sign': '15548bc077f668be6700bd6b645de980'}
-////        // {from=auto, version=3, salt=123, mac=mac, sign=15548bc077f668be6700bd6b645de980, cuid=APICUID, appid=20211003000963466, to=zh}
-////    }
-//    }
-//}

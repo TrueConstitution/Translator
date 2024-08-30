@@ -1,7 +1,7 @@
 package kgg.translator.mixin.world;
 
 import kgg.translator.handler.TranslateHelper;
-import kgg.translator.config.WorldOptions;
+import kgg.translator.option.WorldOption;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 public class EntityRendererMixinForEntityName {
     @ModifyVariable(method = "renderLabelIfPresent", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private Text getText(Text text) {
-        if (!WorldOptions.autoEntityName.isEnable()) return text;
+        if (!WorldOption.autoEntityName.isEnable()) return text;
         return TranslateHelper.translateNoWait(text);
     }
 }

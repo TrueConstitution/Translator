@@ -63,11 +63,6 @@ public abstract class BookEditScreenMixin extends Screen {
                 context.drawText(textRenderer, text, (width + MAX_TEXT_WIDTH) / 2 + 20, y.get(), Colors.WHITE, false);
                 y.addAndGet(textRenderer.fontHeight);
             });
-//            for (int i = 0; i < list.size(); ++i) {
-//                StringVisitable stringVisitable = list.get(i);
-//                int j = i == 0 ? 80 : 92;
-//                context.drawText(textRenderer, stringVisitable, Text.literal(stringVisitable), )
-//                this.drawCenteredTextWithShadow(textRenderer, stringVisitable, this.width / 2, j + 9 * i, Colors.WHITE);
         }
     }
 

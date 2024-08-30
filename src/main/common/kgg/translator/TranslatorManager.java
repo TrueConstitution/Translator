@@ -6,7 +6,7 @@ import com.google.common.cache.LoadingCache;
 import kgg.translator.exception.NoTranslatorSelectedException;
 import kgg.translator.exception.TranslateException;
 import kgg.translator.exception.TranslatorNotConfiguredException;
-import kgg.translator.ocr.ResRegion;
+import kgg.translator.ocrtrans.ResRegion;
 import kgg.translator.translator.Translator;
 import kgg.translator.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -52,22 +52,22 @@ public class TranslatorManager {
             }
         }
     }
-    private static String translate(String text) throws TranslateException {
+    public static String translate(String text) throws TranslateException {
         return translate(text, getCurrentTranslator(), getDefaultFrom(), getDefaultTo());
     }
 
-    private static String translate(String text, Translator translator) throws TranslateException {
+    public static String translate(String text, Translator translator) throws TranslateException {
         return translate(text, translator, getDefaultFrom(), getDefaultTo());
     }
 
-    private static String translate(String text, Translator translator, String from, String to) throws TranslateException {
+    public static String translate(String text, Translator translator, String from, String to) throws TranslateException {
         if (StringUtil.isBlank(text)) return text;
         if (StringUtils.isNumeric(text)) return text;
         checkTranslator(translator);
 
         try {
             String translate = translator.translate(text, from, to);
-            LOGGER.info("{} translate from {} to {}: \"{}\" -> \"{}\"", translator, getOutString(text), getOutString(translate), from, to);
+            LOGGER.info("{} translate from {} to {}: \"{}\" -> \"{}\"", translator, from, to, getOutString(text), getOutString(translate));
             return translate;
         } catch (Exception e) {
             LOGGER.error("{} translate from {} to {} failed: \"{}\"", translator, from, to, getOutString(text), e);
@@ -79,7 +79,7 @@ public class TranslatorManager {
         }
     }
 
-    private static ResRegion[] ocrtrans(Translator translator, byte[] img, String from, String to) throws TranslateException {
+    public static ResRegion[] ocrtrans(Translator translator, byte[] img, String from, String to) throws TranslateException {
         checkTranslator(translator);
         LOGGER.info("{} ocrtrans, from {} to {}", translator, from, to);
         try {

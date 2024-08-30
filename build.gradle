@@ -75,6 +75,8 @@ jar {
     }
 }
 
+remapJar.archiveFileName = archives_base_name + "-" + minecraft_version + "-" + mod_version + ".jar"
+
 // configure the maven publication
 publishing {
     publications {

@@ -3,11 +3,9 @@ package kgg.translator.command;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import kgg.translator.config.Option;
 import kgg.translator.TranslatorConfig;
 import kgg.translator.TranslatorManager;
 import kgg.translator.handler.TranslateHelper;
@@ -20,7 +18,6 @@ public class TranslateConfigCommand {
     public static void register(CommandDispatcher<FabricClientCommandSource> dispatcher) {
         LiteralArgumentBuilder<FabricClientCommandSource> root = ClientCommandManager.literal("transconfig");
 
-        // TODO: 2024/8/29 语言补全
         // /trans-config language <from> [<to>]
         root.then(ClientCommandManager.literal("language")
                 .executes(TranslateConfigCommand::queryLanguage)
@@ -91,95 +88,8 @@ public class TranslateConfigCommand {
                     context.getSource().sendFeedback(Text.literal("OK"));
                     return 0;
                 }));
-        // TODO: 2024/8/28 更好的了解
-        // /trans-config <option> true/false
-        Option.getOptions().forEach(option -> {
-            root.then(ClientCommandManager.literal(option.name)
-                    .executes(context -> queryOption(context, option))
-                    .then(ClientCommandManager.argument("enable", BoolArgumentType.bool())
-                            .executes(context -> {
-                                boolean enable = BoolArgumentType.getBool(context, "enable");
-                                option.setEnable(enable);
-                                return queryOption(context, option);
-                            })));
-        });
-//        // /trans-config chathud add-tip <true/false>
-//        // /trans-config chathud auto <true/false>
-//        root.then(ClientCommandManager.literal("chathud")
-//                .then(ClientCommandManager.literal("auto")
-//                        .executes(TranslateConfigCommand::queryChatHudAuto)
-//                        .then(ClientCommandManager.argument("enable", BoolArgumentType.bool())
-//                                .executes(context -> {
-//                                    boolean enable = BoolArgumentType.getBool(context, "enable");
-//                                    Option.setAutoChatHud(enable);
-//                                    return queryChatHudAuto(context);
-//                                })))
-//                .then(ClientCommandManager.literal("add-tip")
-//                        .executes(TranslateConfigCommand::queryChatHudAddTip)
-//                        .then(ClientCommandManager.argument("enable", BoolArgumentType.bool())
-//                                .executes(context -> {
-//                                    boolean enable = BoolArgumentType.getBool(context, "enable");
-//                                    Option.setAddChatHudTip(enable);
-//                                    return queryChatHudAddTip(context);
-//                                }))));
-//
-//        // /trans-config tooltip <true/false>
-//        root.then(ClientCommandManager.literal("tooltip")
-//                .executes(TranslateConfigCommand::queryTooltip)
-//                .then(ClientCommandManager.argument("enable", BoolArgumentType.bool())
-//                        .executes(context -> {
-//                            boolean enable = BoolArgumentType.getBool(context, "enable");
-//                            Option.setAutoToolTip(enable);
-//                            return queryTooltip(context);
-//                        })));
-//
-//
-//        // /trans-config screentext <true/false>
-//        root.then(ClientCommandManager.literal("screentext")
-//                .executes(TranslateConfigCommand::queryScreenText)
-//                .then(ClientCommandManager.argument("enable", BoolArgumentType.bool())
-//                        .executes(context -> {
-//                            boolean enable = BoolArgumentType.getBool(context, "enable");
-//                            Option.setAutoScreenText(enable);
-//                            return queryScreenText(context);
-//                        })));
-
-
         dispatcher.register(root);
     }
-
-    private static int queryOption(CommandContext<FabricClientCommandSource> context, Option option) {
-        if (option.isEnable()) {
-            context.getSource().sendFeedback(Text.literal("已开启"));
-        } else {
-            context.getSource().sendFeedback(Text.literal("已关闭"));
-        }
-        return 0;
-    }
-
-//    private static int queryScreenText(CommandContext<FabricClientCommandSource> context) {
-//        Text message = Text.literal("当前屏幕文字自动翻译为%s".formatted(Option.isAutoScreenText()));
-//        context.getSource().sendFeedback(message);
-//        return 0;
-//    }
-//
-//    private static int queryTooltip(CommandContext<FabricClientCommandSource> context) {
-//        Text message = Text.literal("当前工具提示翻译为%s".formatted(Option.isAutoToolTip()));
-//        context.getSource().sendFeedback(message);
-//        return 0;
-//    }
-//
-//    private static int queryChatHudAddTip(CommandContext<FabricClientCommandSource> context) {
-//        Text message = Text.literal("当前聊天框添加翻译提示为%s".formatted(Option.isAddChatHudTip()));
-//        context.getSource().sendFeedback(message);
-//        return 0;
-//    }
-//
-//    private static int queryChatHudAuto(CommandContext<FabricClientCommandSource> context) {
-//        Text message = Text.literal("当前聊天框自动翻译为%s".formatted(Option.isAutoChatHud()));
-//        context.getSource().sendFeedback(message);
-//        return 0;
-//    }
 
     private static int queryLanguage(CommandContext<FabricClientCommandSource> context) {
         Text message = Text.literal("当前从%s翻译成%s".formatted(TranslatorManager.getDefaultFrom(), TranslatorManager.getDefaultTo()));

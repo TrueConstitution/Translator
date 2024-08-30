@@ -2,22 +2,21 @@ package kgg.translator.translator;
 
 import com.google.gson.JsonObject;
 import kgg.translator.command.CommandConfigurable;
-import kgg.translator.exception.TranslateException;
-import kgg.translator.ocr.ResRegion;
+import kgg.translator.ocrtrans.ResRegion;
 
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Supplier;
 
 public abstract class Translator implements CommandConfigurable {
     private boolean configured = false;  // 是否已经配置
 
     public abstract String translate(String text, String from, String to) throws IOException;
 
-    public abstract ResRegion[] ocrtrans(byte[] img, String from, String to) throws IOException;
+    public ResRegion[] ocrtrans(byte[] img, String from, String to) throws IOException {
+        return new ResRegion[0];
+    }
 
     public abstract String getName();
 

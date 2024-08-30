@@ -16,7 +16,6 @@ public class ChatHudMixin {
     @Inject(at = @At("HEAD"), method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;ILnet/minecraft/client/gui/hud/MessageIndicator;Z)V")
     private void addMessage(Text message, MessageSignatureData signature, int ticks, MessageIndicator indicator, boolean refresh, CallbackInfo ci) {
         if (refresh) return;
-        // TODO: 2024/8/26 分段
         ChatHubHandler.preHandle((MutableText) message);
     }
 }
