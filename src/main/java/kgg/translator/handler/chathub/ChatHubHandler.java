@@ -1,7 +1,7 @@
 package kgg.translator.handler.chathub;
 
 import kgg.translator.TranslatorManager;
-import kgg.translator.config.ChatOptions;
+import kgg.translator.option.ChatOption;
 import kgg.translator.exception.TranslateException;
 import kgg.translator.util.StringUtil;
 import kgg.translator.util.TextUtil;
@@ -23,15 +23,15 @@ public class ChatHubHandler {
         if (StringUtil.isBlank(text.getString())) {  // 不翻译空行
             return;
         }
-        if (ChatOptions.chatTip.isEnable()) {  // 添加翻译提示
+        if (ChatOption.chatTip.isEnable()) {  // 添加翻译提示
             text.siblings = new ArrayList<>(text.siblings);
             text.append(" ").append(Text.literal("[翻译]").setStyle(Style.EMPTY
                     .withColor(TextColor.fromRgb(65522))
                     .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("点击翻译")))
                     .withClickEvent(new TranslateClickEvent(text))));
         }
-        if (ChatOptions.autoChat.isEnable()) {  // 如果是自动翻译则处理
-            if (ChatOptions.chatTip.isEnable()) {
+        if (ChatOption.autoChat.isEnable()) {  // 如果是自动翻译则处理
+            if (ChatOption.chatTip.isEnable()) {
                 handleWithTranslatingTip(text);
             } else {
                 handle(text);
@@ -43,7 +43,6 @@ public class ChatHubHandler {
 
     public static void handleWithTranslatingTip(MutableText text) {
         text.siblings.remove(text.siblings.size() - 1);  // 移除翻译提示
-//        System.out.println(text.toString() + TextUtil.hasLanguage(TextUtil.getOnlyTranslatableText(text)) + TextUtil.getOnlyTranslatableText(text));
 
         String s = StringUtil.strip(text.getString());
         text.siblings.add(TRANSLATING_TIP);  // 添加翻译中提示

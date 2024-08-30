@@ -19,6 +19,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * 用于工具栏翻译
+ */
 @Mixin(DrawContext.class)
 public abstract class DrawContextMixinForTooltip {
 

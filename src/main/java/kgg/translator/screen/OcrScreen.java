@@ -1,12 +1,11 @@
 package kgg.translator.screen;
 
-import kgg.translator.ocr.ResRegion;
+import kgg.translator.ocrtrans.ResRegion;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import org.lwjgl.glfw.GLFW;
 
 public class OcrScreen extends Screen {
     private final Screen parent;
@@ -34,21 +33,16 @@ public class OcrScreen extends Screen {
     private static final MutableText error = Text.literal("没有识别到文字或识别错误");
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-//        MatrixStack matrices = context.getMatrices();
-//        matrices.scale();
         super.render(context, mouseX, mouseY, delta);
         context.drawText(textRenderer, esc, width - textRenderer.getWidth(esc), height - textRenderer.fontHeight, 0xFFFFFF, true);
         if (resRegions == null) {
             context.drawCenteredTextWithShadow(textRenderer, translatingText, width / 2, height / 2, 0xFFFFFF);
         } else if (resRegions.length == 0) {
-//            context.fill(0, 0, 880, 880, 0xffff0000);
             context.drawCenteredTextWithShadow(textRenderer, error, width / 2, height / 2,  0xFF0000);
         } else {
             for (ResRegion resRegion : resRegions) {
-//                ResRegion resRegion1 = resRegion.scale(1 / client.getWindow().getScaleFactor());
                 context.fill(resRegion.x(), resRegion.y(), resRegion.x() + resRegion.w(), resRegion.y() + resRegion.h(), 0x4cff7272);
 
-                // 蓝色
                 MatrixStack matrices = context.getMatrices();
                 matrices.push();
                 // TODO: 2024/8/28 位置还有点小问题
@@ -67,17 +61,6 @@ public class OcrScreen extends Screen {
             }
         }
     }
-
-//    @Override
-//    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-//        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-//            this.client.setScreen(this.parent);
-//            return true;
-//        }
-//        return super.keyPressed(keyCode, scanCode, modifiers);
-//    }
-
-
     @Override
     public void close() {
         this.client.setScreen(this.parent);
@@ -87,7 +70,6 @@ public class OcrScreen extends Screen {
     public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
         if (resRegions == null || resRegions.length == 0) {
             super.renderBackground(context, mouseX, mouseY, 0.01f);
-
         }
     }
 }

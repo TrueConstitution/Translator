@@ -1,7 +1,7 @@
 package kgg.translator.handler;
 
 import kgg.translator.TranslatorManager;
-import kgg.translator.config.ScreenOptions;
+import kgg.translator.option.ScreenOption;
 import kgg.translator.exception.TranslateException;
 import kgg.translator.util.StringUtil;
 import kgg.translator.util.TextUtil;
@@ -36,7 +36,7 @@ public class TooltipHandler {
      * 0.5秒后翻译文本
      */
     public static void preHandle(DrawContext drawContext, List<Text> text, int mouseX, int mouseY) {
-        if (!ScreenOptions.autoTooltip.isEnable()) {
+        if (!ScreenOption.autoTooltip.isEnable()) {
             return;
         }
 
@@ -107,4 +107,8 @@ public class TooltipHandler {
     public static TooltipComponent[] getTranslatedOrderedText() {
         return translatedOrderedText;
     }
+
+    public record SidebarEntry1(Text name, Text score, int scoreWidth) {
+    }
+
 }

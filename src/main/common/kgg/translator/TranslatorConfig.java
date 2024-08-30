@@ -1,7 +1,6 @@
 package kgg.translator;
 
 import com.google.gson.*;
-import kgg.translator.config.Option;
 import kgg.translator.util.ConfigUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,12 +39,6 @@ public class TranslatorConfig {
     }
 
     public static boolean write(JsonObject config) {
-        Option.getOptions().forEach(option -> {
-            if (option.isEnable() != option.defaultValue) {
-                config.addProperty(option.name, option.isEnable());
-            }
-        });
-
         config.addProperty("defaultFrom", TranslatorManager.getDefaultFrom());
         config.addProperty("defaultTo", TranslatorManager.getDefaultTo());
 
@@ -53,7 +46,7 @@ public class TranslatorConfig {
         TranslatorManager.getTranslators().forEach(translator -> {
             if (translator.isConfigured()) {
                 JsonObject object = new JsonObject();
-                    translator.write(object);
+                translator.write(object);
                 config.add(translator.getName(), object);
             }
         });
@@ -62,13 +55,6 @@ public class TranslatorConfig {
 
     public static boolean read(JsonObject config) {
         try {
-            Option.getOptions().forEach(option -> {
-                JsonElement element = config.get(option.name);
-                if (element != null) {
-                    option.setEnable(element.getAsBoolean());
-                }
-            });
-
             TranslatorManager.setDefaultFrom(config.get("defaultFrom").getAsString());
             TranslatorManager.setDefaultTo(config.get("defaultTo").getAsString());
 

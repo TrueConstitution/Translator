@@ -1,0 +1,14 @@
+{
+    "key.categories.translator": "translator",
+    "key.translator.options": "options screen",
+    "key.translator.ocr": "ocr",
+    "translator.option.chat_tip": "chat tip",
+    "translator.option.auto_chat": "auto chat",
+    "translator.option.auto_tooltip": "auto tooltip",
+    "translator.option.auto_title": "auto title",
+    "translator.option.auto_scoreboard": "auto scoreboard",
+    "translator.option.auto_boss_bar": "auto boss bar",
+    "translator.option.auto_entity_name": "auto entity name",
+    "translator.option.auto_sign": "auto sign"
+
+}

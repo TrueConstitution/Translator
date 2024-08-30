@@ -1,7 +1,7 @@
 package kgg.translator.mixin.world;
 
 import kgg.translator.handler.TranslateHelper;
-import kgg.translator.config.WorldOptions;
+import kgg.translator.option.WorldOption;
 import net.minecraft.entity.decoration.DisplayEntity;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,8 +20,8 @@ public class TextDisplayEntityMixin {
 
     @ModifyVariable(method = "splitLines", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     public DisplayEntity.TextDisplayEntity.LineSplitter getLineSplitter(DisplayEntity.TextDisplayEntity.LineSplitter splitter) {
-        if (translated != WorldOptions.autoEntityName.isEnable()) {
-            translated = WorldOptions.autoEntityName.isEnable();
+        if (translated != WorldOption.autoEntityName.isEnable()) {
+            translated = WorldOption.autoEntityName.isEnable();
             updated = true;
         }
 

@@ -1,7 +1,7 @@
 package kgg.translator.handler;
 
 import kgg.translator.TranslatorManager;
-import kgg.translator.ocr.ResRegion;
+import kgg.translator.ocrtrans.ResRegion;
 import kgg.translator.screen.OcrScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 public class OcrHandler {
-    // log
     private static final Logger LOGGER = LogManager.getLogger(OcrHandler.class);
 
     public static void run() {

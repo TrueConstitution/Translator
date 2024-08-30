@@ -1,8 +1,10 @@
 package kgg.translator.mixin.world;
 
 import kgg.translator.handler.TranslateHelper;
-import kgg.translator.config.WorldOptions;
+import kgg.translator.option.WorldOption;
 import net.minecraft.block.entity.SignText;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ingame.SignEditScreen;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
@@ -30,8 +32,8 @@ public abstract class SignTextMixin {
      */
     @Overwrite
     public OrderedText[] getOrderedMessages(boolean filtered, Function<Text, OrderedText> messageOrderer) {
-        if (translated != WorldOptions.autoSign.isEnable()) {
-            translated = WorldOptions.autoSign.isEnable();
+        if (translated != WorldOption.autoSign.isEnable()) {
+            translated = WorldOption.autoSign.isEnable();
             updated = true;
         }
 
@@ -46,10 +48,11 @@ public abstract class SignTextMixin {
             for (int i = 0; i < 4; ++i) {
                 Text message = this.getMessage(i, filtered);
                 if (translated) {
-
-                    message = TranslateHelper.translateNoWait(message, t -> {
-                        updated = true;
-                    });
+                    if (!(MinecraftClient.getInstance().currentScreen instanceof SignEditScreen)) {  // 如果没在编辑告示牌
+                        message = TranslateHelper.translateNoWait(message, t -> {
+                            updated = true;
+                        });
+                    }
                 }
 
                 this.orderedMessages[i] = messageOrderer.apply(message);
