@@ -1,4 +1,4 @@
-package kgg.translator.handler.chathub;
+package kgg.translator.handler;
 
 import kgg.translator.TranslatorManager;
 import kgg.translator.option.ChatOption;
@@ -102,4 +102,13 @@ public class ChatHubHandler {
                 .withHoverEvent(TRANSLATE_HOVER_EVENT)
                 .withClickEvent(new TranslateClickEvent(text)));
     }
+
+    public static class TranslateClickEvent extends ClickEvent {
+        public MutableText text;
+        public TranslateClickEvent(MutableText text) {
+            super(null, "");
+            this.text = text;
+        }
+    }
+
 }

@@ -1,6 +1,22 @@
 pluginManagement {
     repositories {
         maven {
+            name = 'aliyun'
+            url = 'https://maven.aliyun.com/repository/public'
+        }
+        maven {
+            name = 'aliyun'
+            url 'https://maven.aliyun.com/repository/central'
+        }
+        maven {
+            name = 'aliyun'
+            url 'https://maven.aliyun.com/repository/gradle-plugin'
+        }
+        maven {
+            name = 'aliyun'
+            url 'https://maven.aliyun.com/repository/apache-snapshots'
+        }
+        maven {
             name = 'Fabric'
             url = 'https://maven.fabricmc.net/'
         }

@@ -1,6 +1,6 @@
 package kgg.translator.mixin.hud;
 
-import kgg.translator.handler.chathub.ChatHubHandler;
+import kgg.translator.handler.ChatHubHandler;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.network.message.MessageSignatureData;
