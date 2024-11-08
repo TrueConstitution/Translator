@@ -19,7 +19,6 @@ public class BaiduTranslatorImpl extends BaiduTranslator{
                 .then(ClientCommandManager.argument("app_id", StringArgumentType.word())
                         .then(ClientCommandManager.argument("app_key", StringArgumentType.word()).executes(context -> {
                             setConfig(StringArgumentType.getString(context, "app_id"), StringArgumentType.getString(context, "app_key"));
-                            setDelayTime(1000 / IntegerArgumentType.getInteger(context, "qps"));
                             context.getSource().sendFeedback(Text.literal("OK"));
                             return 0;
                         })));

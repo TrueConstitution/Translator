@@ -23,6 +23,7 @@ import org.spongepowered.asm.mixin.Shadow;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @Mixin(InGameHud.class)
 public abstract class InGameHudForScoreboardMixin {
@@ -30,9 +31,9 @@ public abstract class InGameHudForScoreboardMixin {
 
     @Shadow @Final private static String SCOREBOARD_JOINER;
 
-    @Shadow private int scaledHeight;
-
-    @Shadow private int scaledWidth;
+//    @Shadow private int scaledHeight;
+//
+//    @Shadow private int scaledWidth;
 
     @Shadow @Final private MinecraftClient client;
 
@@ -92,15 +93,16 @@ public abstract class InGameHudForScoreboardMixin {
         int finalMaxWidth = maxWidth;
         context.draw(() -> {
             int entryCount = sidebarEntries.size();
+            Objects.requireNonNull(getTextRenderer());
             int totalHeight = entryCount * this.getTextRenderer().fontHeight;
-            int startY = this.scaledHeight / 2 + totalHeight / 3;
+            int startY = context.getScaledWindowHeight() / 2 + totalHeight / 3;
             int paddingX = 3;
-            int xStart = this.scaledWidth - finalMaxWidth - paddingX;
-            int xEnd = this.scaledWidth - paddingX + 2;
+            int xStart = context.getScaledWindowWidth() - finalMaxWidth - paddingX;
+            int xEnd = context.getScaledWindowWidth() - paddingX + 2;
             int bgColorLight = this.client.options.getTextBackgroundColor(0.3f);
             int bgColorDark = this.client.options.getTextBackgroundColor(0.4f);
             int topOffset = startY - entryCount * this.getTextRenderer().fontHeight;
-
+            Objects.requireNonNull(getTextRenderer());
             context.fill(xStart - 2, topOffset - this.getTextRenderer().fontHeight - 1, xEnd, topOffset - 1, bgColorDark);
             context.fill(xStart - 2, topOffset - 1, xEnd, startY, bgColorLight);
             context.drawText(this.getTextRenderer(), finalText, xStart + finalMaxWidth / 2 - textWidth / 2, topOffset - this.getTextRenderer().fontHeight, Colors.WHITE, false);
