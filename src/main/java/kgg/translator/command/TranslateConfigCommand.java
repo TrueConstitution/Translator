@@ -12,7 +12,7 @@ import kgg.translator.handler.TranslateHelper;
 import kgg.translator.translator.Translator;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.text.*;
 
 public class TranslateConfigCommand {
     public static void register(CommandDispatcher<FabricClientCommandSource> dispatcher) {
@@ -21,18 +21,18 @@ public class TranslateConfigCommand {
         // /trans-config language <from> [<to>]
         root.then(ClientCommandManager.literal("language")
                 .executes(TranslateConfigCommand::queryLanguage)
-                .then(ClientCommandManager.argument("from", StringArgumentType.word())
+                .then(ClientCommandManager.argument("from", LangArgumentType.lang())
                         .executes(context -> {
-                            String from = StringArgumentType.getString(context, "from");
-                            TranslatorManager.setDefaultFrom(from);
+                            String from = LangArgumentType.getLanguage(context, "from");
+                            TranslatorManager.setFrom(from);
                             return queryLanguage(context);
                         })
-                        .then(ClientCommandManager.argument("to", StringArgumentType.word())
+                        .then(ClientCommandManager.argument("to", LangArgumentType.lang())
                                 .executes(context -> {
-                                    String from = StringArgumentType.getString(context, "from");
-                                    String to = StringArgumentType.getString(context, "to");
-                                    TranslatorManager.setDefaultFrom(from);
-                                    TranslatorManager.setDefaultTo(to);
+                                    String from = LangArgumentType.getLanguage(context, "from");
+                                    String to = LangArgumentType.getLanguage(context, "to");
+                                    TranslatorManager.setFrom(from);
+                                    TranslatorManager.setTo(to);
                                     return queryLanguage(context);
                                 }))));
         // /trans-config translator <translator> ...
@@ -43,8 +43,8 @@ public class TranslateConfigCommand {
                     .executes(context -> {
                         boolean b = TranslatorManager.setCurrentTranslator(translator);
                         int a = queryTranslator(context);
-                        if (b) {
-                            context.getSource().sendFeedback(Text.literal("记得修改语言哦"));
+                        if (!b) {
+                            context.getSource().sendError(Text.literal("未能自动切换语言，需要手动修改语言"));
                         }
                         return a;
                     });
@@ -69,8 +69,8 @@ public class TranslateConfigCommand {
                 .then(ClientCommandManager.argument("json", StringArgumentType.greedyString())
                         .executes(context -> {
                             try {
-                                String json = StringArgumentType.getString(context, "json");
-                                JsonObject object = (JsonObject) JsonParser.parseString(json);
+                                String str = StringArgumentType.getString(context, "json");
+                                JsonObject object = JsonParser.parseString(str).getAsJsonObject();
                                 boolean read = TranslatorConfig.read(object);
                                 if (!read) throw new Exception();
                                 context.getSource().sendFeedback(Text.literal("OK"));
@@ -88,23 +88,35 @@ public class TranslateConfigCommand {
                     context.getSource().sendFeedback(Text.literal("OK"));
                     return 0;
                 }));
+
+        // /trans-config config-txt
+        root.then(ClientCommandManager.literal("config").executes(context -> {
+            JsonObject object = new JsonObject();
+            TranslatorConfig.write(object);
+            String txt = object.toString();
+            MutableText message = Text.literal(txt);
+            message.setStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, txt)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("点击复制"))));
+            context.getSource().sendFeedback(message);
+            return 0;
+        }));
+
         dispatcher.register(root);
     }
 
     private static int queryLanguage(CommandContext<FabricClientCommandSource> context) {
-        Text message = Text.literal("当前从%s翻译成%s".formatted(TranslatorManager.getDefaultFrom(), TranslatorManager.getDefaultTo()));
+        Text message = Text.literal("当前从%s翻译成%s".formatted(TranslatorManager.getFrom(), TranslatorManager.getTo()));
         context.getSource().sendFeedback(message);
         return 0;
     }
 
     private static int queryTranslator(CommandContext<FabricClientCommandSource> context) {
-        Translator translator = TranslatorManager.getCurrentTranslator();
+        Translator translator = TranslatorManager.getCurrent();
         Text message = Text.literal("当前使用的翻译器为%s".formatted(translator));
         context.getSource().sendFeedback(message);
         if (translator.isConfigured()) {
-                message = Text.literal("%s已配置".formatted(translator));
+                message = Text.literal("%s已配置".formatted(translator)).withColor(0x00ff00);
             } else {
-                message = Text.literal("%s未配置".formatted(translator));
+                message = Text.literal("%s未配置".formatted(translator)).withColor(0xff0000);
             }
             context.getSource().sendFeedback(message);
         return 0;

@@ -3,35 +3,6 @@ plugins {
     id 'maven-publish'
 }
 
-allprojects {
-    repositories {
-//        maven {
-//            url 'https://maven.aliyun.com/repository/public/'
-//        }
-//        maven {
-//            url 'https://maven.aliyun.com/repository/central'
-//        }
-        maven {
-            name = 'aliyun'
-            url = 'https://maven.aliyun.com/repository/public'
-        }
-        maven {
-            name = 'aliyun'
-            url 'https://maven.aliyun.com/repository/central'
-        }
-        maven {
-            name = 'aliyun'
-            url 'https://maven.aliyun.com/repository/gradle-plugin'
-        }
-        maven {
-            name = 'aliyun'
-            url 'https://maven.aliyun.com/repository/apache-snapshots'
-        }
-        mavenLocal()
-        mavenCentral()
-    }
-}
-
 version = project.mod_version
 group = project.maven_group
 
@@ -41,16 +12,16 @@ sourceSets {
     }
 }
 
-//repositories {
-//    maven { url 'https://maven.aliyun.com/repository/central/' }
-//    maven { url 'https://maven.aliyun.com/repository/public/' }
-//    mavenCentral()
-//    // Add repositories to retrieve artifacts from in here.
-//    // You should only use this when depending on other mods because
-//    // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-//    // See https://docs.gradle.org/current/userguide/declaring_repositories.html
-//    // for more information about repositories.
-//}
+repositories {
+    maven { url 'https://maven.aliyun.com/repository/central/' }
+    maven { url 'https://maven.aliyun.com/repository/public/' }
+    mavenCentral()
+    // Add repositories to retrieve artifacts from in here.
+    // You should only use this when depending on other mods because
+    // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+    // See https://docs.gradle.org/current/userguide/declaring_repositories.html
+    // for more information about repositories.
+}
 
 dependencies {
     // To change the versions see the gradle.properties file
@@ -75,7 +46,7 @@ processResources {
     }
 }
 
-def targetJavaVersion = 22
+def targetJavaVersion = 21
 tasks.withType(JavaCompile).configureEach {
     // ensure that the encoding is set to UTF-8, no matter what the system default is
     // this fixes some edge cases with special characters not displaying correctly

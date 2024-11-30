@@ -25,20 +25,20 @@ public class RequestUtil {
         return send(request, HttpResponse.BodyHandlers.ofString()).body();
     }
 
-//    public static String postForm(String url, Map<String, Object> params) throws IOException {
-////        URI uri = URI.create(HttpAuthenticationService.concatenateURL(new URL(url), HttpAuthenticationService.buildQuery(params)).toString());
-//
-//        HttpRequest request = HttpRequest.newBuilder(URI.create(url))
-//                .header("Content-Type", "application/x-www-form-urlencoded'")
-//                .POST(HttpRequest.BodyPublishers.ofString(HttpAuthenticationService.buildQuery(params)))
-//                .build();
-//        return send(request, HttpResponse.BodyHandlers.ofString()).body();
-//    }
+    public static String postForm(String url, Map<String, Object> params) throws IOException {
+        String requestBody = HttpAuthenticationService.buildQuery(params);
+        URI uri = URI.create(url);
+        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder(uri)
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody));
+        HttpRequest request = requestBuilder.build();
+        return send(request, HttpResponse.BodyHandlers.ofString()).body();
+    }
 
     /**
-     * 用post方法请求，附带文件
+     * 附带文件
      */
-    public static String postFile(String url, Map<String, Object> params, byte[] fileData, String name) throws IOException {
+    public static String fromData(String url, Map<String, Object> params, byte[] fileData, String name) throws IOException {
         URI uri = URI.create(HttpAuthenticationService.concatenateURL(new URL(url), HttpAuthenticationService.buildQuery(params)).toString());
         // 构建请求体
         String boundary = UUID.randomUUID().toString();

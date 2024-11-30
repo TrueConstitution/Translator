@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(EntityRenderer.class)
 public class EntityRendererMixinForEntityName {
+    // todo 只翻译近距离实体
     @ModifyVariable(method = "renderLabelIfPresent", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private Text getText(Text text) {
         if (!WorldOption.autoEntityName.isEnable()) return text;

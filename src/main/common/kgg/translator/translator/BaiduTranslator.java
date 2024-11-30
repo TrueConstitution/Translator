@@ -5,8 +5,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import kgg.translator.command.CommandConfigurable;
+import kgg.translator.exception.ErrorCodeException;
 import kgg.translator.exception.TranslateException;
 import kgg.translator.ocrtrans.ResRegion;
+import kgg.translator.util.EasyProperties;
 import kgg.translator.util.RequestUtil;
 
 import java.io.IOException;
@@ -40,10 +42,8 @@ public abstract class BaiduTranslator extends Translator implements CommandConfi
             String result = RequestUtil.get(URL, params);
             JsonObject object = (JsonObject) JsonParser.parseString(result);
             // 解析
-            JsonElement errorCode = object.get("error_code");
-            if (errorCode != null) {
-                throw new TranslateException(errorCode.getAsString());
-            }
+            checkCode(object.get("error_code"));
+
             StringJoiner joiner = new StringJoiner(" ");
             for (JsonElement element : object.get("trans_result").getAsJsonArray()) {
                 joiner.add(element.getAsJsonObject().get("dst").getAsString());
@@ -70,13 +70,10 @@ public abstract class BaiduTranslator extends Translator implements CommandConfi
                 "sign", sign
         );
         // 请求
-        String result = RequestUtil.postFile(OCR_URL, params, img, "image");
+        String result = RequestUtil.fromData(OCR_URL, params, img, "image");
         JsonObject object = (JsonObject) JsonParser.parseString(result);
         // 解析
-        int errorCode = object.get("error_code").getAsInt();
-        if (errorCode != 0) {
-            throw new TranslateException(String.valueOf(errorCode));
-        }
+        checkCode(object.get("error_code"));
 
         return object.getAsJsonObject("data").getAsJsonArray("content").asList().stream().map(JsonElement::getAsJsonObject).map(c -> {
             String rect = c.get("rect").getAsString();
@@ -90,6 +87,13 @@ public abstract class BaiduTranslator extends Translator implements CommandConfi
         this.delayTime = delayTime;
     }
 
+    private void checkCode(JsonElement code) throws TranslateException {
+        if (code != null) {
+            if (code.getAsInt() != 0) {
+                throw new ErrorCodeException("baidu", code.getAsString());
+            }
+        }
+    }
 
     @Override
     public String getName() {
@@ -113,5 +117,21 @@ public abstract class BaiduTranslator extends Translator implements CommandConfi
         object.addProperty("appId", appId);
         object.addProperty("appKey", appKey);
         object.addProperty("delayTime", delayTime);
+    }
+
+    @Override
+    public EasyProperties getLanguageProperties() {
+        return LANGUAGES;
+    }
+
+
+    public static final EasyProperties LANGUAGES;
+
+    static {
+        try {
+            LANGUAGES = new EasyProperties(BaiduTranslator.class.getClassLoader().getResourceAsStream("languages/baidu.properties"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

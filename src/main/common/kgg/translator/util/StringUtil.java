@@ -2,11 +2,11 @@ package kgg.translator.util;
 
 public class StringUtil {
     public static boolean isBlank(String text) {
-        return text.replace("§.", "").isBlank();
+        return text.replaceAll("§.", "").isBlank();
     }
 
     public static String strip(String text) {
-        return text.replace("§.", "").strip();
+        return text.replaceAll("§.", "").strip();
     }
 
     public static boolean equals(String text1, String text2) {

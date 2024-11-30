@@ -1,6 +1,7 @@
 package kgg.translator;
 
 import com.google.gson.*;
+import kgg.translator.option.Option;
 import kgg.translator.util.ConfigUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -9,18 +10,22 @@ import java.io.*;
 
 public class TranslatorConfig {
     private static final File file = new File("config", "translator.json");
+    private static final File optionFile = new File("config", "translator_option.json");
     private static final Logger LOGGER = LogManager.getLogger(TranslatorConfig.class);
+
 
     public static boolean readFile() {
         JsonObject config;
         try {
             config = ConfigUtil.load(file);
-        } catch (IOException e) {
+            JsonObject options = ConfigUtil.load(optionFile);
+            boolean b = readOptions(options);
+            assert b;
+        } catch (Exception e) {
             LOGGER.error("Failed to read config file", e);
             return false;
         }
         return read(config);
-
     }
 
     public static boolean writeFile() {
@@ -28,6 +33,10 @@ public class TranslatorConfig {
         if (write(config)) {
             try {
                 ConfigUtil.save(file, config);
+                JsonObject options = new JsonObject();
+                boolean b = writeOptions(options);
+                assert b;
+                ConfigUtil.save(optionFile, options);
                 LOGGER.info("Config written successfully");
                 return true;
             } catch (Exception e) {
@@ -39,10 +48,10 @@ public class TranslatorConfig {
     }
 
     public static boolean write(JsonObject config) {
-        config.addProperty("defaultFrom", TranslatorManager.getDefaultFrom());
-        config.addProperty("defaultTo", TranslatorManager.getDefaultTo());
+        config.addProperty("from", TranslatorManager.getFrom());
+        config.addProperty("to", TranslatorManager.getTo());
 
-        config.addProperty("current", TranslatorManager.getCurrentTranslator().getName());
+        config.addProperty("current", TranslatorManager.getCurrent().getName());
         TranslatorManager.getTranslators().forEach(translator -> {
             if (translator.isConfigured()) {
                 JsonObject object = new JsonObject();
@@ -55,8 +64,8 @@ public class TranslatorConfig {
 
     public static boolean read(JsonObject config) {
         try {
-            TranslatorManager.setDefaultFrom(config.get("defaultFrom").getAsString());
-            TranslatorManager.setDefaultTo(config.get("defaultTo").getAsString());
+            TranslatorManager.setFrom(config.get("from").getAsString());
+            TranslatorManager.setTo(config.get("to").getAsString());
 
             String currentTranslator = config.get("current").getAsString();
             TranslatorManager.getTranslators().forEach(translator -> {
@@ -80,5 +89,28 @@ public class TranslatorConfig {
             LOGGER.error("Failed to read config", e);
             return false;
         }
+    }
+
+    private static boolean readOptions(JsonObject config) {
+        try {
+            for (Option option : Option.getOptions()) {
+                JsonElement element = config.get(option.name);
+                if (element != null) {
+                    option.setEnable(element.getAsBoolean());
+                }
+            }
+            LOGGER.info("Options read successfully");
+            return true;
+        } catch (Exception e) {
+            LOGGER.error("Failed to read options", e);
+            return false;
+        }
+    }
+
+    private static boolean writeOptions(JsonObject config) {
+        for (Option option : Option.getOptions()) {
+            config.addProperty(option.name, option.isEnable());
+        }
+        return true;
     }
 }

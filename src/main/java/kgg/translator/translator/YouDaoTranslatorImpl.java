@@ -9,9 +9,9 @@ import net.minecraft.text.Text;
 public class YouDaoTranslatorImpl extends YouDaoTranslator {
     @Override
     public void register(LiteralArgumentBuilder<FabricClientCommandSource> node) {
-        node.then(ClientCommandManager.argument("app_key", StringArgumentType.word())
-                .then(ClientCommandManager.argument("app_secret", StringArgumentType.word()).executes(context -> {
-                    setConfig(StringArgumentType.getString(context, "app_key"), StringArgumentType.getString(context, "app_secret"));
+        node.then(ClientCommandManager.argument("appId", StringArgumentType.word())
+                .then(ClientCommandManager.argument("appKey", StringArgumentType.word()).executes(context -> {
+                    setConfig(StringArgumentType.getString(context, "appId"), StringArgumentType.getString(context, "appKey"));
                     context.getSource().sendFeedback(Text.literal("OK"));
                     return 0;
                 })));

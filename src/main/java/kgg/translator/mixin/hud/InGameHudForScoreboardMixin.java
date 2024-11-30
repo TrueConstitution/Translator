@@ -1,7 +1,7 @@
 package kgg.translator.mixin.hud;
 
 import kgg.translator.option.ScreenOption;
-import kgg.translator.handler.TooltipHandler;
+import kgg.translator.handler.TipHandler;
 import kgg.translator.handler.TranslateHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -31,10 +31,6 @@ public abstract class InGameHudForScoreboardMixin {
 
     @Shadow @Final private static String SCOREBOARD_JOINER;
 
-//    @Shadow private int scaledHeight;
-//
-//    @Shadow private int scaledWidth;
-
     @Shadow @Final private MinecraftClient client;
 
     @Shadow @Final private static Comparator<ScoreboardEntry> SCOREBOARD_ENTRY_COMPARATOR;
@@ -50,7 +46,7 @@ public abstract class InGameHudForScoreboardMixin {
 
 
         // Stream operations to create an array of SidebarEntry instances.
-        List<TooltipHandler.SidebarEntry1> sidebarEntries = scoreboard.getScoreboardEntries(objective).stream()
+        List<TipHandler.SidebarEntry> sidebarEntries = scoreboard.getScoreboardEntries(objective).stream()
                 .filter(score -> !score.hidden())
                 .sorted(SCOREBOARD_ENTRY_COMPARATOR)
                 .limit(15L)
@@ -67,7 +63,7 @@ public abstract class InGameHudForScoreboardMixin {
 //                    text3 = (MutableText) ScreenOptions.getTranslateText(text3);
 
                     int scoreWidth = this.getTextRenderer().getWidth(text3);
-                    return new TooltipHandler.SidebarEntry1(text2, text3, scoreWidth);
+                    return new TipHandler.SidebarEntry(text2, text3, scoreWidth);
                 })
                 .toList();
 
@@ -84,7 +80,7 @@ public abstract class InGameHudForScoreboardMixin {
 
         // Determine the maximum width required for rendering.
         int maxWidth = this.getTextRenderer().getWidth(text);
-        for (TooltipHandler.SidebarEntry1 sidebarEntry : sidebarEntries) {
+        for (TipHandler.SidebarEntry sidebarEntry : sidebarEntries) {
             maxWidth = Math.max(maxWidth, this.getTextRenderer().getWidth(sidebarEntry.name()) + (sidebarEntry.scoreWidth() > 0 ? joinerWidth + sidebarEntry.scoreWidth() : 0));
         }
 
@@ -108,7 +104,7 @@ public abstract class InGameHudForScoreboardMixin {
             context.drawText(this.getTextRenderer(), finalText, xStart + finalMaxWidth / 2 - textWidth / 2, topOffset - this.getTextRenderer().fontHeight, Colors.WHITE, false);
 
             for (int i = 0; i < entryCount; ++i) {
-                TooltipHandler.SidebarEntry1 sidebarEntry = sidebarEntries.get(i);
+                TipHandler.SidebarEntry sidebarEntry = sidebarEntries.get(i);
                 int yPosition = startY - (entryCount - i) * this.getTextRenderer().fontHeight;
                 context.drawText(this.getTextRenderer(), sidebarEntry.name(), xStart, yPosition, Colors.WHITE, false);
                 context.drawText(this.getTextRenderer(), sidebarEntry.score(), xEnd - sidebarEntry.scoreWidth(), yPosition, Colors.WHITE, false);

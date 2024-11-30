@@ -32,7 +32,7 @@ public class OcrHandler {
                     }).toArray(ResRegion[]::new);
                     screen.setResRegions(ocrtrans);
                 } catch (Exception e) {
-                    screen.setResRegions(new ResRegion[0]);
+                    screen.setError(e.getMessage());
                 }
             });
         } catch (IOException e) {

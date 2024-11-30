@@ -2,7 +2,9 @@ package kgg.translator.translator;
 
 import com.google.gson.JsonObject;
 import kgg.translator.command.CommandConfigurable;
+import kgg.translator.exception.TranslateException;
 import kgg.translator.ocrtrans.ResRegion;
+import kgg.translator.util.EasyProperties;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -15,7 +17,7 @@ public abstract class Translator implements CommandConfigurable {
     public abstract String translate(String text, String from, String to) throws IOException;
 
     public ResRegion[] ocrtrans(byte[] img, String from, String to) throws IOException {
-        return new ResRegion[0];
+        throw new TranslateException(getName() + "不支持图片翻译");
     }
 
     public abstract String getName();
@@ -30,6 +32,10 @@ public abstract class Translator implements CommandConfigurable {
 
     public void setConfigured(boolean configured) {
         this.configured = configured;
+    }
+
+    public EasyProperties getLanguageProperties() {
+        return null;
     }
 
     public abstract void read(JsonObject object);

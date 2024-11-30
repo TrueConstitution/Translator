@@ -12,8 +12,10 @@
     "world.TextDisplayEntityMixin"
   ],
   "client": [
+    "DrawContextMixinForScreen",
     "hud.BossBarHudMixin",
     "hud.ChatHudMixin",
+    "hud.ChatScreenMixin",
     "hud.InGameHudForScoreboardMixin",
     "hud.InGameHudForTitleMixin",
     "screen.BookScreenMixin"

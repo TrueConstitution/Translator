@@ -4,3 +4,4 @@ mutable    field   net/minecraft/text/MutableText    siblings    Ljava/util/List
 extendable    method    net/minecraft/text/MutableText    <init>    (Lnet/minecraft/text/TextContent;Ljava/util/List;Lnet/minecraft/text/Style;)V
 accessible    method    net/minecraft/client/gui/hud/ChatHud    refresh    ()V
 accessible field net/minecraft/block/entity/SignText orderedMessages [Lnet/minecraft/text/OrderedText;
+accessible field net/minecraft/client/gui/hud/ChatHud messages Ljava/util/List;

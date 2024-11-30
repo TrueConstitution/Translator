@@ -3,9 +3,9 @@ package kgg.translator;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import kgg.translator.exception.NoTranslatorSelectedException;
+import kgg.translator.exception.NoTranslatorException;
 import kgg.translator.exception.TranslateException;
-import kgg.translator.exception.TranslatorNotConfiguredException;
+import kgg.translator.exception.NotConfiguredException;
 import kgg.translator.ocrtrans.ResRegion;
 import kgg.translator.translator.Translator;
 import kgg.translator.util.StringUtil;
@@ -23,8 +23,8 @@ public class TranslatorManager {
     private static Translator current;
     private static final List<Translator> translators = new LinkedList<>();
 
-    private static String defaultFrom = "auto";
-    private static String defaultTo = "zh-cn";
+    private static String from = "auto";
+    private static String to = "zh-cn";
 
     private static final LoadingCache<String, String> cache = CacheBuilder.newBuilder().maximumSize(1000).build(new CacheLoader<>() {
         @Override
@@ -38,7 +38,7 @@ public class TranslatorManager {
     }
 
     public static ResRegion[] ocrtrans(byte[] img) throws TranslateException {
-        return ocrtrans(getCurrentTranslator(), img, getDefaultFrom(), getDefaultTo());
+        return ocrtrans(getCurrent(), img, getFrom(), getTo());
     }
 
     public static String cachedTranslate(String text) throws TranslateException {
@@ -53,11 +53,11 @@ public class TranslatorManager {
         }
     }
     public static String translate(String text) throws TranslateException {
-        return translate(text, getCurrentTranslator(), getDefaultFrom(), getDefaultTo());
+        return translate(text, getCurrent(), getFrom(), getTo());
     }
 
     public static String translate(String text, Translator translator) throws TranslateException {
-        return translate(text, translator, getDefaultFrom(), getDefaultTo());
+        return translate(text, translator, getFrom(), getTo());
     }
 
     public static String translate(String text, Translator translator, String from, String to) throws TranslateException {
@@ -96,10 +96,10 @@ public class TranslatorManager {
 
     private static void checkTranslator(Translator translator) throws TranslateException {
         if (translator == null) {
-            throw new NoTranslatorSelectedException();
+            throw new NoTranslatorException();
         }
         if (!translator.isConfigured()) {
-            throw new TranslatorNotConfiguredException(translator);
+            throw new NotConfiguredException(translator);
         }
     }
 
@@ -108,43 +108,60 @@ public class TranslatorManager {
         cache.invalidateAll();
     }
 
-    public static Translator getCurrentTranslator() {
+    public static Translator getCurrent() {
         return current;
     }
 
     public static boolean setCurrentTranslator(Translator translator) {
         LOGGER.info("Set current translator to {}", translator);
-        boolean b = current != null && !current.equals(translator);
-        TranslatorManager.current = translator;
-        return b;
+        if (current != translator) {
+            if (current != null && translator.getLanguageProperties() != null && current.getLanguageProperties() != null) {
+                String originalFrom = current.getLanguageProperties().getKeysByValue(from);
+                String originalTo = current.getLanguageProperties().getKeysByValue(to);
+                if (originalFrom != null && originalTo != null) {
+                    String newFrom = translator.getLanguageProperties().getProperty(originalFrom);
+                    String newTo = translator.getLanguageProperties().getProperty(originalTo);
+                    if (newFrom != null && newTo != null) {
+                        setFrom(newFrom);
+                        setTo(newTo);
+                        TranslatorManager.current = translator;
+                        return true;
+                    }
+                }
+            }
+            TranslatorManager.current = translator;
+            return false;
+        }
+        return true;
     }
+
 
     public static void addTranslator(Translator translator) {
         LOGGER.info("Add translator {}", translator);
-        if (translators.size() == 0) {
+        if (translators.isEmpty()) {
             setCurrentTranslator(translator);
         } else {
-            if (!getCurrentTranslator().isConfigured() && translator.isConfigured()) {
+            if (!getCurrent().isConfigured() && translator.isConfigured()) {
                 setCurrentTranslator(translator);
             }
         }
         translators.add(translator);
     }
 
-    public static String getDefaultTo() {
-        return defaultTo;
+    public static String getTo() {
+        return to;
     }
 
-    public static void setDefaultTo(String defaultTo) {
-        TranslatorManager.defaultTo = defaultTo;
+    public static void setTo(String defaultTo) {
+        TranslatorManager.to = defaultTo;
     }
 
-    public static String getDefaultFrom() {
-        return defaultFrom;
+    public static String getFrom() {
+        return from;
     }
 
-    public static void setDefaultFrom(String defaultFrom) {
-        TranslatorManager.defaultFrom = defaultFrom;
+    public static void setFrom(String defaultFrom) {
+        TranslatorManager.from = defaultFrom;
     }
 
     public static List<Translator> getTranslators() {
