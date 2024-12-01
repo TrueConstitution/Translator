@@ -1,39 +1,38 @@
 package kgg.translator.mixin.hud;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.mojang.datafixers.util.Pair;
 import kgg.translator.option.ScreenOption;
-import kgg.translator.handler.TipHandler;
 import kgg.translator.handler.TranslateHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.ScoreboardEntry;
 import net.minecraft.scoreboard.ScoreboardObjective;
+import net.minecraft.scoreboard.ScoreboardPlayerScore;
 import net.minecraft.scoreboard.Team;
-import net.minecraft.scoreboard.number.NumberFormat;
-import net.minecraft.scoreboard.number.StyledNumberFormat;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
+import net.minecraft.util.Formatting;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-import java.util.Comparator;
+import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Mixin(InGameHud.class)
 public abstract class InGameHudForScoreboardMixin {
     @Shadow public abstract TextRenderer getTextRenderer();
 
-    @Shadow @Final private static String SCOREBOARD_JOINER;
-
     @Shadow @Final private MinecraftClient client;
 
-    @Shadow @Final private static Comparator<ScoreboardEntry> SCOREBOARD_ENTRY_COMPARATOR;
+    @Shadow private int scaledHeight;
+
+    @Shadow private int scaledWidth;
 
     /**
      * @author KGG_Xing_Kong
@@ -42,74 +41,98 @@ public abstract class InGameHudForScoreboardMixin {
      */
     @Overwrite
     private void renderScoreboardSidebar(DrawContext context, ScoreboardObjective objective) {
+        // 获取目标得分板和所有玩家的分数
         Scoreboard scoreboard = objective.getScoreboard();
-        NumberFormat numberFormat = objective.getNumberFormatOr(StyledNumberFormat.RED);
+        Collection<ScoreboardPlayerScore> allScores = scoreboard.getAllPlayerScores(objective);
 
+        // 过滤出玩家名称不为空且不以 "#" 开头的分数
+        List<ScoreboardPlayerScore> filteredScores = allScores.stream()
+                .filter(score -> score.getPlayerName() != null && !score.getPlayerName().startsWith("#"))
+                .collect(Collectors.toList());
 
-        // Stream operations to create an array of SidebarEntry instances.
-        List<TipHandler.SidebarEntry> sidebarEntries = scoreboard.getScoreboardEntries(objective).stream()
-                .filter(score -> !score.hidden())
-                .sorted(SCOREBOARD_ENTRY_COMPARATOR)
-                .limit(15L)
-                .map(scoreboardEntry -> {
-                    Team team = scoreboard.getScoreHolderTeam(scoreboardEntry.owner());
-                    Text text = scoreboardEntry.name();
-                    MutableText text2 = Team.decorateName(team, text);
-                    MutableText text3 = scoreboardEntry.formatted(numberFormat);
+        // 如果列表大小大于 15，获取从倒数第 15 个开始的分数
+        Collection<ScoreboardPlayerScore> scoresToRender;
+        if (filteredScores.size() > 15) {
+            scoresToRender = Lists.newArrayList(Iterables.skip(filteredScores, filteredScores.size() - 15));
+        } else {
+            scoresToRender = filteredScores;
+        }
 
-                    // 翻译
-                    if (ScreenOption.autoScoreboard.isEnable()) {
-                        text2 = (MutableText) TranslateHelper.translateNoWait(text2);
-                    }
-//                    text3 = (MutableText) ScreenOptions.getTranslateText(text3);
+        // 创建用于存储玩家和分数的对
+        List<Pair<ScoreboardPlayerScore, Text>> scoreTextList = Lists.newArrayListWithCapacity(scoresToRender.size());
 
-                    int scoreWidth = this.getTextRenderer().getWidth(text3);
-                    return new TipHandler.SidebarEntry(text2, text3, scoreWidth);
-                })
-                .toList();
-
-        Text text = objective.getDisplayName();
+        // 获取目标的显示名称
+        Text objectiveName = objective.getDisplayName();
 
         // 翻译
         if (ScreenOption.autoScoreboard.isEnable()) {
-
-            text = TranslateHelper.translateNoWait(text);
+            objectiveName = TranslateHelper.translateNoWait(objectiveName);
         }
+        int objectiveNameWidth = this.getTextRenderer().getWidth(objectiveName);
+        int maxWidth = objectiveNameWidth;
 
-        int textWidth = this.getTextRenderer().getWidth(text);
-        int joinerWidth = this.getTextRenderer().getWidth(SCOREBOARD_JOINER);
+        // ":" 的宽度
+        int colonWidth = this.getTextRenderer().getWidth(": ");
 
-        // Determine the maximum width required for rendering.
-        int maxWidth = this.getTextRenderer().getWidth(text);
-        for (TipHandler.SidebarEntry sidebarEntry : sidebarEntries) {
-            maxWidth = Math.max(maxWidth, this.getTextRenderer().getWidth(sidebarEntry.name()) + (sidebarEntry.scoreWidth() > 0 ? joinerWidth + sidebarEntry.scoreWidth() : 0));
-        }
+        // 为每个玩家的分数计算最大宽度
+        for (ScoreboardPlayerScore score : scoresToRender) {
+            Team playerTeam = scoreboard.getPlayerTeam(score.getPlayerName());
+            Text playerNameText = Team.decorateName(playerTeam, Text.literal(score.getPlayerName()));
 
-        // Rendering logic
-        Text finalText = text;
-        int finalMaxWidth = maxWidth;
-        context.draw(() -> {
-            int entryCount = sidebarEntries.size();
-            Objects.requireNonNull(getTextRenderer());
-            int totalHeight = entryCount * this.getTextRenderer().fontHeight;
-            int startY = context.getScaledWindowHeight() / 2 + totalHeight / 3;
-            int paddingX = 3;
-            int xStart = context.getScaledWindowWidth() - finalMaxWidth - paddingX;
-            int xEnd = context.getScaledWindowWidth() - paddingX + 2;
-            int bgColorLight = this.client.options.getTextBackgroundColor(0.3f);
-            int bgColorDark = this.client.options.getTextBackgroundColor(0.4f);
-            int topOffset = startY - entryCount * this.getTextRenderer().fontHeight;
-            Objects.requireNonNull(getTextRenderer());
-            context.fill(xStart - 2, topOffset - this.getTextRenderer().fontHeight - 1, xEnd, topOffset - 1, bgColorDark);
-            context.fill(xStart - 2, topOffset - 1, xEnd, startY, bgColorLight);
-            context.drawText(this.getTextRenderer(), finalText, xStart + finalMaxWidth / 2 - textWidth / 2, topOffset - this.getTextRenderer().fontHeight, Colors.WHITE, false);
-
-            for (int i = 0; i < entryCount; ++i) {
-                TipHandler.SidebarEntry sidebarEntry = sidebarEntries.get(i);
-                int yPosition = startY - (entryCount - i) * this.getTextRenderer().fontHeight;
-                context.drawText(this.getTextRenderer(), sidebarEntry.name(), xStart, yPosition, Colors.WHITE, false);
-                context.drawText(this.getTextRenderer(), sidebarEntry.score(), xEnd - sidebarEntry.scoreWidth(), yPosition, Colors.WHITE, false);
+            // 翻译
+            if (ScreenOption.autoScoreboard.isEnable()) {
+                playerNameText = TranslateHelper.translateNoWait(playerNameText);
             }
-        });
+
+            scoreTextList.add(Pair.of(score, playerNameText));
+
+            maxWidth = Math.max(maxWidth, this.getTextRenderer().getWidth(playerNameText) + colonWidth + this.getTextRenderer().getWidth(Integer.toString(score.getScore())));
+        }
+
+        // 计算得分板的起始位置和高度
+        int totalHeight = scoresToRender.size() * 9;
+        int startY = this.scaledHeight / 2 + totalHeight / 3;
+        int startX = this.scaledWidth - maxWidth - 3;
+
+        // 背景色
+        int backgroundColor1 = this.client.options.getTextBackgroundColor(0.3F);
+        int backgroundColor2 = this.client.options.getTextBackgroundColor(0.4F);
+
+        // 渲染分数板
+        int currentIndex = 0;
+        for (Pair<ScoreboardPlayerScore, Text> pair : scoreTextList) {
+            currentIndex++;
+
+            ScoreboardPlayerScore score = pair.getFirst();
+            Text playerNameText = pair.getSecond();
+
+            // 翻译
+            if (ScreenOption.autoScoreboard.isEnable()) {
+                playerNameText = TranslateHelper.translateNoWait(playerNameText);
+            }
+
+            // 使用红色格式化分数
+            Formatting scoreColor = Formatting.RED;
+            String scoreString = "" + scoreColor + score.getScore();
+
+            int posX = startX;
+            int posY = startY - currentIndex * 9;
+
+            // 绘制背景
+            context.fill(posX - 2, posY, startX + maxWidth - 2, posY + 9, backgroundColor1);
+
+            // 绘制玩家名字
+            context.drawText(this.getTextRenderer(), playerNameText, posX, posY, -1, false);
+
+            // 绘制分数
+            context.drawText(this.getTextRenderer(), scoreString, startX + maxWidth - 2 - this.getTextRenderer().getWidth(scoreString), posY, -1, false);
+
+            // 如果是最后一行，绘制顶部背景
+            if (currentIndex == scoreTextList.size()) {
+                context.fill(posX - 2, posY - 9 - 1, startX + maxWidth - 2, posY - 1, backgroundColor2);
+                context.fill(posX - 2, posY - 1, startX + maxWidth - 2, posY, backgroundColor1);
+                context.drawText(this.getTextRenderer(), objectiveName, posX + maxWidth / 2 - objectiveNameWidth / 2, posY - 9, -1, false);
+            }
+        }
     }
 }

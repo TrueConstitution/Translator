@@ -1,7 +1,7 @@
 package kgg.translator.util;
 
+import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.OrderedText;
-import net.minecraft.text.PlainTextContent;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Language;
@@ -14,7 +14,7 @@ public class TextUtil {
                     if (!Language.getInstance().hasTranslation(content.getKey())) {
                         return false;
                     }
-                } else if (sibling.getContent() instanceof PlainTextContent content) {
+                } else if (sibling.getContent() instanceof LiteralTextContent content) {
                     if (!StringUtil.isBlank(content.string())) {
                         return false;
                     }

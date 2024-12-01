@@ -108,9 +108,9 @@ public class OcrScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void renderBackground(DrawContext context) {
         if (resRegions == null || resRegions.length == 0) {
-            super.renderBackground(context, mouseX, mouseY, 0.01f);
+            super.renderBackground(context);
         }
     }
 }

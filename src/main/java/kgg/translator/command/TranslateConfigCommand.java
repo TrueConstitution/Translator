@@ -119,9 +119,9 @@ public class TranslateConfigCommand {
         Text message = Text.literal("当前使用的翻译器为%s".formatted(translator));
         context.getSource().sendFeedback(message);
         if (translator.isConfigured()) {
-                message = Text.literal("%s已配置".formatted(translator)).withColor(0x00ff00);
+                message = Text.literal("%s已配置".formatted(translator)).setStyle(Style.EMPTY.withColor(0x00ff00));
             } else {
-                message = Text.literal("%s未配置".formatted(translator)).withColor(0xff0000);
+                message = Text.literal("%s未配置".formatted(translator)).setStyle(Style.EMPTY.withColor(0xff0000));
             }
             context.getSource().sendFeedback(message);
         return 0;
