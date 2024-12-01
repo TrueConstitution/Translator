@@ -25,7 +25,7 @@ public class RequestUtil {
         return send(request, HttpResponse.BodyHandlers.ofString()).body();
     }
 
-    public static String postForm(String url, Map<String, Object> params) throws IOException {
+    public static String form(String url, Map<String, Object> params) throws IOException {
         String requestBody = HttpAuthenticationService.buildQuery(params);
         URI uri = URI.create(url);
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder(uri)

@@ -37,9 +37,9 @@ public class TipHandler {
             if (time > MinecraftClient.getInstance().getCurrentFps() * time1) {
                 time = Integer.MAX_VALUE;
                 if (translatedOrderedText == null) {
-                    startAsyncTranslation(text);
+                    startTranslation(text);
                 } else if (translatedTextCount == text.size() && noTranslateCount != text.size()) {
-                    drawTranslateText = true;
+                    drawTranslateText = true;  // 有翻译内容
                 }
             } else {
                 time++;
@@ -55,19 +55,18 @@ public class TipHandler {
         drawTranslateText = false;
     }
 
-    private static void startAsyncTranslation(List<Text> text) {
-        OrderedText[] temp = translatedOrderedText = new OrderedText[text.size()];
+    private static void startTranslation(List<Text> texts) {
+        OrderedText[] temp = translatedOrderedText = new OrderedText[texts.size()];
         translatedTextCount = 0;
         noTranslateCount = 0;
 
-        CompletableFuture<Void>[] futures = new CompletableFuture[text.size()];
-        for (int i = 0; i < text.size(); i++) {
-            Text t = text.get(i);
-            String string = t.getString();
+        for (int i = 0; i < texts.size(); i++) {
+            Text text = texts.get(i);
+            String string = text.getString();
             int finalI = i;
 
-            futures[i] = CompletableFuture.supplyAsync(() -> {
-                if (TextUtil.isSystemText(t)) {
+            CompletableFuture.supplyAsync(() -> {
+                if (TextUtil.isSystemText(text)) {
                     return string;
                 }
                 try {
@@ -77,7 +76,7 @@ public class TipHandler {
                     return string;
                 }
             }).thenApply(trans -> {
-                temp[finalI] = OrderedText.styledForwardsVisitedString(trans, t.getStyle());
+                temp[finalI] = OrderedText.styledForwardsVisitedString(trans, text.getStyle());
                 if (StringUtil.equals(trans, string)) {
                     noTranslateCount++;
                 }
@@ -85,16 +84,6 @@ public class TipHandler {
                 return null;
             });
         }
-
-//        CompletableFuture.allOf(futures).thenRun(() -> {
-//            MinecraftClient.getInstance().execute(() -> {
-//                if (translatedTextCount == text.size() && noTranslateCount != text.size()) {
-////                    if (text.equals(lastText)) {
-//                    drawTranslateText = true;
-////                    }
-//                }
-//            });
-//        });
     }
 
     public static OrderedText[] getTranslatedOrderedText() {

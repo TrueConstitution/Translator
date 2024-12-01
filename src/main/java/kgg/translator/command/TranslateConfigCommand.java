@@ -2,6 +2,7 @@ package kgg.translator.command;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -41,7 +42,7 @@ public class TranslateConfigCommand {
         TranslatorManager.getTranslators().forEach(translator -> {
             LiteralArgumentBuilder<FabricClientCommandSource> subNode = ClientCommandManager.literal(translator.getName())
                     .executes(context -> {
-                        boolean b = TranslatorManager.setCurrentTranslator(translator);
+                        boolean b = TranslatorManager.setTranslator(translator);
                         int a = queryTranslator(context);
                         if (!b) {
                             context.getSource().sendError(Text.literal("未能自动切换语言，需要手动修改语言"));
@@ -68,16 +69,20 @@ public class TranslateConfigCommand {
         root.then(ClientCommandManager.literal("load")
                 .then(ClientCommandManager.argument("json", StringArgumentType.greedyString())
                         .executes(context -> {
+                            String str = StringArgumentType.getString(context, "json");
                             try {
-                                String str = StringArgumentType.getString(context, "json");
                                 JsonObject object = JsonParser.parseString(str).getAsJsonObject();
-                                boolean read = TranslatorConfig.read(object);
-                                if (!read) throw new Exception();
-                                context.getSource().sendFeedback(Text.literal("OK"));
-                            } catch (Exception e) {
-                                context.getSource().sendError(Text.literal("Failed to load config"));
+                                boolean read = TranslatorConfig.readConfig(object);
+                                if (read) {
+                                    context.getSource().sendFeedback(Text.literal("OK"));
+                                } else {
+                                    context.getSource().sendError(Text.literal("Failed to load config"));
+                                }
+                                return 0;
+                            } catch (JsonSyntaxException e) {
+                                context.getSource().sendError(Text.literal("Invalid json"));
+                                return 0;
                             }
-                            return 0;
                         })));
 
         // /trans-config clearcache
@@ -92,7 +97,7 @@ public class TranslateConfigCommand {
         // /trans-config config-txt
         root.then(ClientCommandManager.literal("config").executes(context -> {
             JsonObject object = new JsonObject();
-            TranslatorConfig.write(object);
+            TranslatorConfig.writeConfig(object);
             String txt = object.toString();
             MutableText message = Text.literal(txt);
             message.setStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, txt)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("点击复制"))));

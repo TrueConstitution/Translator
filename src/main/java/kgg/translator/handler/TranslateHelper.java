@@ -52,8 +52,8 @@ public class TranslateHelper {
         if (translatingTexts.contains(text)) {
             return text;
         }
-        translatingTexts.add(text);
 
+        translatingTexts.add(text);
         CompletableFuture.runAsync(() -> {
             try {
                 String s = TranslatorManager.cachedTranslate(text);

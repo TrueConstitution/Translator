@@ -23,7 +23,7 @@ import java.util.List;
  * 用于工具栏翻译
  */
 @Mixin(DrawContext.class)
-public abstract class DrawContextMixinForScreen {
+public abstract class DrawContextMixinScreenText {
 
     @Shadow public abstract void drawOrderedTooltip(TextRenderer textRenderer, List<? extends OrderedText> text, int x, int y);
     @Unique
@@ -32,9 +32,7 @@ public abstract class DrawContextMixinForScreen {
     @Inject(method = "drawText(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/text/OrderedText;IIIZ)I", at = @At("RETURN"))
     public void drawText(TextRenderer textRenderer, OrderedText text, int x, int y, int color, boolean shadow, CallbackInfoReturnable<Integer> cir) {
         if (ScreenOption.screenTranslate.isEnable()) {
-            if (wrapped) {
-                wrapped = false;
-            } else {
+            if (!wrapped) {
                 int w = textRenderer.getWidth(text);
                 int h = textRenderer.fontHeight;
                 handle(textRenderer, List.of(text), x, y, w, h);
@@ -42,10 +40,17 @@ public abstract class DrawContextMixinForScreen {
         }
     }
 
-    @Inject(method = "drawTextWrapped", at = @At("RETURN"))
-    public void drawTextWrapped(TextRenderer textRenderer, StringVisitable text, int x, int y, int width, int color, CallbackInfo ci) {
+    @Inject(method = "drawTextWrapped", at = @At("HEAD"))
+    public void drawTextWrappedHead(TextRenderer textRenderer, StringVisitable text, int x, int y, int width, int color, CallbackInfo ci) {
         if (ScreenOption.screenTranslate.isEnable()) {
             wrapped = true;
+        }
+    }
+
+    @Inject(method = "drawTextWrapped", at = @At("TAIL"))
+    public void drawTextWrappedTAIL(TextRenderer textRenderer, StringVisitable text, int x, int y, int width, int color, CallbackInfo ci) {
+        if (ScreenOption.screenTranslate.isEnable()) {
+            wrapped = false;
             int w = 0;
             int h = 0;
             List<OrderedText> texts = textRenderer.wrapLines(text, width);
@@ -58,6 +63,9 @@ public abstract class DrawContextMixinForScreen {
         }
     }
 
+    /**
+     * 如果鼠标选中，与物品一样，在旁边显示译文
+     */
     @Unique
     private void handle(TextRenderer textRenderer, List<OrderedText> texts, int x, int y, int w, int h) {
         List<Text> t = texts.stream().map(text -> (Text) Text.literal(TextUtil.getString(text))).toList();
@@ -68,7 +76,7 @@ public abstract class DrawContextMixinForScreen {
         if (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h) {
             TipHandler.handle((DrawContext)(Object)this, t, mouseX, mouseY, 0.2f);
             if (TipHandler.drawTranslateText) {
-                TipHandler.drawTranslateText = false;
+                TipHandler.drawTranslateText = false;  // 防止触发DrawContextMixinTooltip的方法
                 drawOrderedTooltip(textRenderer, List.of(TipHandler.getTranslatedOrderedText()), mouseX, mouseY);
             }
         }

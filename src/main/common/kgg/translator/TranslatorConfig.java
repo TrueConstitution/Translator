@@ -16,21 +16,22 @@ public class TranslatorConfig {
 
     public static boolean readFile() {
         JsonObject config;
+        JsonObject options;
         try {
             config = ConfigUtil.load(file);
-            JsonObject options = ConfigUtil.load(optionFile);
-            boolean b = readOptions(options);
+            boolean b = readConfig(config);
             assert b;
+            options = ConfigUtil.load(optionFile);
         } catch (Exception e) {
             LOGGER.error("Failed to read config file", e);
             return false;
         }
-        return read(config);
+        return readOptions(options);
     }
 
     public static boolean writeFile() {
         JsonObject config = new JsonObject();
-        if (write(config)) {
+        if (writeConfig(config)) {
             try {
                 ConfigUtil.save(file, config);
                 JsonObject options = new JsonObject();
@@ -47,7 +48,7 @@ public class TranslatorConfig {
         return false;
     }
 
-    public static boolean write(JsonObject config) {
+    public static boolean writeConfig(JsonObject config) {
         config.addProperty("from", TranslatorManager.getFrom());
         config.addProperty("to", TranslatorManager.getTo());
 
@@ -62,7 +63,7 @@ public class TranslatorConfig {
         return true;
     }
 
-    public static boolean read(JsonObject config) {
+    public static boolean readConfig(JsonObject config) {
         try {
             TranslatorManager.setFrom(config.get("from").getAsString());
             TranslatorManager.setTo(config.get("to").getAsString());
@@ -80,7 +81,7 @@ public class TranslatorConfig {
                 }
 
                 if (translator.getName().equals(currentTranslator)) {
-                    TranslatorManager.setCurrentTranslator(translator);
+                    TranslatorManager.setTranslator(translator);
                 }
             });
             LOGGER.info("Config read successfully");

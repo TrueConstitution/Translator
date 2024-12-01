@@ -25,7 +25,7 @@ import java.util.Optional;
  * 用于工具栏翻译
  */
 @Mixin(DrawContext.class)
-public abstract class DrawContextMixinForTooltip {
+public abstract class DrawContextMixinTooltip {
 
     @Shadow @Deprecated public abstract void draw(Runnable drawCallback);
 
@@ -60,10 +60,13 @@ public abstract class DrawContextMixinForTooltip {
 
     @Inject(method = "drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;IILnet/minecraft/client/gui/tooltip/TooltipPositioner;)V", at = @At("HEAD"))
     public void drawTooltip(TextRenderer textRenderer, List<Text> text, int x, int y, TooltipPositioner positioner, CallbackInfo ci) {
-        DrawContextMixinForTooltip.textRenderer = textRenderer;
-        DrawContextMixinForTooltip.positioner = positioner;
+        DrawContextMixinTooltip.textRenderer = textRenderer;
+        DrawContextMixinTooltip.positioner = positioner;
     }
 
+    /**
+     * 重定向getPosition可以方便的获得屏幕大小
+     */
     @Redirect(method = "drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;IILnet/minecraft/client/gui/tooltip/TooltipPositioner;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/tooltip/TooltipPositioner;getPosition(IIIIII)Lorg/joml/Vector2ic;"))
     public Vector2ic getPosition(TooltipPositioner instance, int screenWidth, int screenHeight, int x, int y, int width, int height) {
         // 原位置
@@ -73,7 +76,7 @@ public abstract class DrawContextMixinForTooltip {
             return position;
         } else {
             List<TooltipComponent> components = Arrays.stream(TipHandler.getTranslatedOrderedText()).map(TooltipComponent::of).toList();
-            TipHandler.drawTranslateText = false;
+            TipHandler.drawTranslateText = false;  // 反正下面重新调用此方法再次执行到这里
             if (!components.isEmpty()) {
                 // 计算翻译文本的矩阵大小
                 int translatedRectWidth = 0;
@@ -89,7 +92,7 @@ public abstract class DrawContextMixinForTooltip {
                 /*显示工具栏逻辑如下
                 * 尝试让原文和译文保存在同一行
                 * 但是如果译文的宽度+超过屏幕宽度，则会自动变到左边
-                * 所以要让译文在下一行
+                * 所以要让译文在上下行
                 * */
 
                 if (position.x() + width + translatedRectWidth + 12 > screenWidth) {

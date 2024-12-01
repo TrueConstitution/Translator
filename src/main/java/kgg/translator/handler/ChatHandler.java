@@ -40,7 +40,6 @@ public class ChatHandler {
             return;
         }
 
-        /*如果在翻译队列，则添加翻译中按钮，如果不在，并且没有翻译按钮，则添加翻译结果按钮*/
         if (translatingTexts.contains(text)) {
             text.append(" ").append(TRANSLATING_TIP);
         } else if (getTranslateClickEvent(text) == null) {
@@ -57,7 +56,7 @@ public class ChatHandler {
             MutableText text = initText(message.content());
             /*需要移除翻译提示的文本
             * 1.有翻译按钮
-            * 2.没被点过（点过的是结果*/
+            * 2.没被点过（点过的是结果）*/
             TranslateClickEvent event = getTranslateClickEvent(text);
             if (event != null && !event.clicked) {
                 text.siblings.removeLast();
@@ -108,7 +107,7 @@ public class ChatHandler {
         if (translatingTexts.contains(text)) {
             return;
         }
-        text.siblings.removeLast();  // 添加翻译中提示
+        text.siblings.removeLast();
         translate(text);  // 获得没有提示按钮时的文本
         text.siblings.add(TRANSLATING_TIP);
         refresh();

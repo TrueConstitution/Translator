@@ -47,8 +47,8 @@ public class BookScreenMixin extends Screen {
                     cachedPage.forEach(text -> sb.add(TextUtil.getString(text)));
 
                     translateText = TranslatorManager.cachedTranslate(sb.toString());
-                } catch (TranslateException ignored) {
-                    translateText = "翻译失败";
+                } catch (TranslateException e) {
+                    translateText = e.getMessage();
                 }
             });
         }).dimensions(this.width / 2 + 2 - (98 / 2), 196 + 20 + 4, 98, 20).build());

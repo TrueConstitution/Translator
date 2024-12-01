@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 public class OcrHandler {
     private static final Logger LOGGER = LogManager.getLogger(OcrHandler.class);
 
-    public static void run() {
+    public static void start() {
         MinecraftClient client = MinecraftClient.getInstance();
         OcrScreen screen = new OcrScreen(client.currentScreen);
         client.setScreen(screen);

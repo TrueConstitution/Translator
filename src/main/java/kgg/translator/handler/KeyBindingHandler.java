@@ -20,7 +20,7 @@ public class KeyBindingHandler {
             }
 
             while (OCR_KEY.wasPressed()) {
-                OcrHandler.run();
+                OcrHandler.start();
             }
         });
     }

@@ -38,6 +38,7 @@ public abstract class InGameHudForScoreboardMixin {
     /**
      * @author KGG_Xing_Kong
      * @reason 翻译计分板
+     * AI重写的
      */
     @Overwrite
     private void renderScoreboardSidebar(DrawContext context, ScoreboardObjective objective) {

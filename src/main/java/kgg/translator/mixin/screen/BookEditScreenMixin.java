@@ -46,8 +46,8 @@ public abstract class BookEditScreenMixin extends Screen {
                 CompletableFuture.runAsync(() -> {
                     try {
                         translateText = TranslatorManager.cachedTranslate(pages.get(currentPage));
-                    } catch (TranslateException ignored) {
-                        translateText = "翻译失败";
+                    } catch (TranslateException e) {
+                        translateText = e.getMessage();
                     }
                 });
             }

@@ -112,7 +112,7 @@ public class TranslatorManager {
         return current;
     }
 
-    public static boolean setCurrentTranslator(Translator translator) {
+    public static boolean setTranslator(Translator translator) {
         LOGGER.info("Set current translator to {}", translator);
         if (current != translator) {
             if (current != null && translator.getLanguageProperties() != null && current.getLanguageProperties() != null) {
@@ -139,10 +139,10 @@ public class TranslatorManager {
     public static void addTranslator(Translator translator) {
         LOGGER.info("Add translator {}", translator);
         if (translators.isEmpty()) {
-            setCurrentTranslator(translator);
+            setTranslator(translator);
         } else {
             if (!getCurrent().isConfigured() && translator.isConfigured()) {
-                setCurrentTranslator(translator);
+                setTranslator(translator);
             }
         }
         translators.add(translator);

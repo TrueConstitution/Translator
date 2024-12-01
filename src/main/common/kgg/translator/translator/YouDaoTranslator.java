@@ -55,7 +55,7 @@ public abstract class YouDaoTranslator extends Translator {
         String q = Base64.getEncoder().encodeToString(img);
         Map<String, Object> params = buildParams(q, from, to);
         params.put("type", "1");
-        String result = RequestUtil.postForm(OCR_URL, params);
+        String result = RequestUtil.form(OCR_URL, params);
 
         JsonObject object = (JsonObject) JsonParser.parseString(result);
         checkCode(Integer.parseInt(object.get("errorCode").getAsString()));
