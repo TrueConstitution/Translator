@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import kgg.translator.exception.ErrorCodeException;
 import kgg.translator.exception.TranslateException;
-import kgg.translator.modmenu.ModMenuConfigurable;
 import kgg.translator.ocrtrans.ResRegion;
 import kgg.translator.util.EasyProperties;
 import kgg.translator.util.RequestUtil;
@@ -15,7 +14,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public abstract class YouDaoTranslator extends Translator implements ModMenuConfigurable {
+public abstract class YouDaoTranslator extends Translator {
     public static final String URL = "https://openapi.youdao.com/api";
     private static final String OCR_URL = "https://openapi.youdao.com/ocrtransapi";
     protected String appId = "";
