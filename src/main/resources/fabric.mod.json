@@ -4,16 +4,28 @@
   "version": "${version}",
   "name": "翻译器",
   "description": "用于翻译聊天，界面，和世界",
-  "authors": ["KGG_Xing_Kong"],
+  "authors": [
+    {
+      "name": "KGG_Xing_Kong",
+      "contact": {
+        "homepage": "https://space.bilibili.com/349780481"
+      }
+    }
+  ],
   "contact": {
-    "homepage": "https://space.bilibili.com/349780481"
+    "homepage": "https://modrinth.com/mod/translator",
+    "sources": "https://github.com/Cfghtiu/Translator",
+    "issues": "https://github.com/Cfghtiu/Translator/issues"
   },
-  "license": "All-Rights-Reserved",
+  "license": "GNU GPL 3.0",
   "icon": "assets/translator/icon.png",
   "environment": "client",
   "entrypoints": {
     "client": [
       "kgg.translator.TranslatorMod"
+    ],
+    "modmenu": [
+      "kgg.translator.modmenu.ModMenuApiImpl"
     ]
   },
   "mixins": [

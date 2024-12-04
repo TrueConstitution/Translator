@@ -13,12 +13,14 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ChatHandler {
     private static final Logger LOGGER = LogManager.getLogger(ChatHandler.class);
 
-    private static final ArrayList<MutableText> translatingTexts = new ArrayList<>();
+    private static final List<MutableText> translatingTexts = new CopyOnWriteArrayList<>();
 
     private static void refresh() {
         MinecraftClient.getInstance().inGameHud.getChatHud().refresh();
@@ -70,9 +72,10 @@ public class ChatHandler {
         MutableText initText = initText(text);
         if (ChatOption.autoChat.isEnable()) {  // 如果是自动翻译则处理
             translate(initText);
-        }
-        if (MinecraftClient.getInstance().currentScreen instanceof ChatScreen) {
-            addTip(initText);  // 如果在聊天框内，则添加翻译按钮
+        } else if (ChatOption.chatTip.isEnable()) {
+            if (MinecraftClient.getInstance().currentScreen instanceof ChatScreen) {
+                addTip(initText);  // 如果在聊天框内，则添加翻译按钮
+            }
         }
     }
 
