@@ -70,13 +70,10 @@ java {
     withSourcesJar()
 }
 
-jar {
-    from("LICENSE") {
-        rename { "${it}_${project.archivesBaseName}"}
-    }
-}
-
-remapJar.archiveFileName = archives_base_name + "-" + minecraft_version + "-" + mod_version + ".jar"
+jar.archiveFileName = "${archives_base_name}-${minecraft_version}-${mod_version}-dev.jar"
+sourcesJar.archiveFileName = "${archives_base_name}-${minecraft_version}-${mod_version}-sources.jar"
+remapJar.archiveFileName = "${archives_base_name}-${minecraft_version}-${mod_version}.jar"
+remapSourcesJar.archiveFileName = "${archives_base_name}-${minecraft_version}-${mod_version}-sources.jar"
 
 // configure the maven publication
 publishing {
