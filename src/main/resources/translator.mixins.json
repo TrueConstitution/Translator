@@ -13,6 +13,7 @@
   ],
   "client": [
     "DrawContextMixinScreenText",
+    "MessageHandlerMixin",
     "hud.BossBarHudMixin",
     "hud.ChatHudMixin",
     "hud.ChatScreenMixin",
