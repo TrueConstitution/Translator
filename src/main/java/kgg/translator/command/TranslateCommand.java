@@ -38,11 +38,11 @@ public class TranslateCommand {
             Text message;
             try {
                 String result = TranslatorManager.translate(text, TranslatorManager.getCurrent(), from, to);
-                message = Text.literal("[结果] " +result).setStyle(Style.EMPTY
+                message = Text.translatable("translator.translate.result", result).setStyle(Style.EMPTY
                         .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, result))
-                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("点击复制"))));
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.translatable("translator.translate.copy_result"))));
             } catch (TranslateException e) {
-                message = Text.literal("[错误] " + e.getMessage()).formatted(Formatting.RED);
+                message = Text.translatable("translator.translate.error", e.getMessage()).formatted(Formatting.RED);
             }
             Text finalMessage = message;
             MinecraftClient.getInstance().execute(() -> {

@@ -5,6 +5,7 @@ import kgg.translator.command.CommandConfigurable;
 import kgg.translator.exception.TranslateException;
 import kgg.translator.ocrtrans.ResRegion;
 import kgg.translator.util.EasyProperties;
+import net.minecraft.text.Text;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +18,7 @@ public abstract class Translator implements CommandConfigurable {
     public abstract String translate(String text, String from, String to) throws IOException;
 
     public ResRegion[] ocrtrans(byte[] img, String from, String to) throws IOException {
-        throw new TranslateException(getName() + "不支持图片翻译");
+        throw new TranslateException(getName() + Text.translatable("translator.error.ocr_unsupported_error").getString());
     }
 
     public abstract String getName();

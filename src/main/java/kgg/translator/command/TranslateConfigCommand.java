@@ -45,7 +45,7 @@ public class TranslateConfigCommand {
                         boolean b = TranslatorManager.setTranslator(translator);
                         int a = queryTranslator(context);
                         if (!b) {
-                            context.getSource().sendError(Text.literal("未能自动切换语言，需要手动修改语言"));
+                            context.getSource().sendError(Text.translatable(""));
                         }
                         return a;
                     });
@@ -100,7 +100,7 @@ public class TranslateConfigCommand {
             TranslatorConfig.writeConfig(object);
             String txt = object.toString();
             MutableText message = Text.literal(txt);
-            message.setStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, txt)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("点击复制"))));
+            message.setStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, txt)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.translatable("translator.translate.copy_result"))));
             context.getSource().sendFeedback(message);
             return 0;
         }));
@@ -109,19 +109,19 @@ public class TranslateConfigCommand {
     }
 
     private static int queryLanguage(CommandContext<FabricClientCommandSource> context) {
-        Text message = Text.literal("当前从%s翻译成%s".formatted(TranslatorManager.getFrom(), TranslatorManager.getTo()));
+        Text message = Text.translatable("translator.current_translation", TranslatorManager.getFrom(), TranslatorManager.getTo());
         context.getSource().sendFeedback(message);
         return 0;
     }
 
     private static int queryTranslator(CommandContext<FabricClientCommandSource> context) {
         Translator translator = TranslatorManager.getCurrent();
-        Text message = Text.literal("当前使用的翻译器为%s".formatted(translator));
+        Text message = Text.translatable("translator.current_translator", translator.getName());
         context.getSource().sendFeedback(message);
         if (translator.isConfigured()) {
-                message = Text.literal("%s已配置".formatted(translator)).setStyle(Style.EMPTY.withColor(0x00ff00));
+                message = Text.translatable("translator.translator_configured",translator.getName()).setStyle(Style.EMPTY.withColor(0x00ff00));
             } else {
-                message = Text.literal("%s未配置".formatted(translator)).setStyle(Style.EMPTY.withColor(0xff0000));
+                message = Text.translatable("translator.translator_not_configured",translator.getName()).setStyle(Style.EMPTY.withColor(0xff0000));
             }
             context.getSource().sendFeedback(message);
         return 0;

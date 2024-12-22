@@ -41,7 +41,7 @@ public abstract class BookEditScreenMixin extends Screen {
     @Inject(method = "init", at = @At("HEAD"))
     public void init(CallbackInfo ci) {
         // 翻译按钮放到done按钮和cancel按钮的中间的下面
-        translateButton = addDrawableChild(ButtonWidget.builder(Text.literal("翻译"), button -> {
+        translateButton = addDrawableChild(ButtonWidget.builder(Text.translatable("translator.translate"), button -> {
             if (!signing) {
                 CompletableFuture.runAsync(() -> {
                     try {

@@ -37,8 +37,8 @@ public class OcrScreen extends Screen {
         }
     }
 
-    private static final MutableText translatingText = Text.literal("翻译中");
-    private static final MutableText esc = Text.literal("按Esc取消");
+    private static final MutableText translatingText = Text.translatable("translator.translate.in_progress");
+    private static final MutableText esc = Text.translatable("translator.OcrScreen.esc");
     private MutableText error;
 
     @Override

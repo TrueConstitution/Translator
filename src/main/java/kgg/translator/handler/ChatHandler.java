@@ -45,9 +45,9 @@ public class ChatHandler {
         if (translatingTexts.contains(text)) {
             text.append(" ").append(TRANSLATING_TIP);
         } else if (getTranslateClickEvent(text) == null) {
-            text.append(" ").append(Text.literal("[翻译]").setStyle(Style.EMPTY
+            text.append(" ").append(Text.literal("[").append(Text.translatable("translator.translate")).append(Text.literal("]")).setStyle(Style.EMPTY
                     .withColor(TextColor.fromRgb(65522))
-                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("点击翻译")))
+                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.translatable("translator.translate.click_to_translate")))
                     .withClickEvent(new TranslateClickEvent(text))
                     .withInsertion(text.getString())));
         }
@@ -79,7 +79,7 @@ public class ChatHandler {
         }
     }
 
-    private static final Text TRANSLATING_TIP = Text.literal("[翻译中]")
+    private static final Text TRANSLATING_TIP = Text.literal("[").append(Text.translatable("translator.translate.in_progress")).append(Text.literal("]"))
             .setStyle(Style.EMPTY
                     .withColor(TextColor.fromRgb(2259711))
                     .withClickEvent(new TranslateClickEvent(null)));
