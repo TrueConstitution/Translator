@@ -37,6 +37,10 @@
   "translator.translator_not_configured": "%s未配置",
   "translator.error.lang_switch_fail": "未能自动切换语言，需要手动修改语言",
 
+  "translator.translation.source": "源语言",
+  "translator.translation.target": "目标语言",
+  "translator.translation.does_not_exist": "未知语言",
+
   "translator.error.baidu.52001": "请求超时，请重试",
   "translator.error.baidu.52002": "服务端系统错误，请重试",
   "translator.error.baidu.52003": "未授权用户，请检查 appid 是否正确或者服务是否开通",

@@ -11,7 +11,7 @@
     "translator.option.auto_entity_name": "Auto translate entity names",
     "translator.option.auto_sign": "Auto translate signs",
     "translator.option.sign_combine": "Combine sign lines",
-    "translator.option.screen_translate": "screen translate",
+    "translator.option.screen_translate": "Auto translate GUIs",
     "translator.option.auto_title.desc": "Note: Don't use it for timed titles. The content will be retranslated every time the countdown changes.",
     "translator.option.auto_tooltip.desc": "Once turned on, when you hover the mouse over an item for over 0.4 seconds, the item info will be translated.",
     "translator.option.auto_entity_name.desc": "Note: Don't enable it on multiplayer servers. Lots of entities can clog the translation queue and it'll translate player names too.",
@@ -36,6 +36,10 @@
     "translator.translator_configured": "%s is configured",
     "translator.translator_not_configured": "%s is not configured",
     "translator.error.lang_switch_fail": "Failed to switch language, manual intervention required",
+
+    "translator.translation.source": "Source Language",
+    "translator.translation.target": "Target Language",
+    "translator.translation.does_not_exist": "Language does not exist",
 
     "translator.error.baidu.52001": "请求超时，请重试",
     "translator.error.baidu.52002": "服务端系统错误，请重试",
