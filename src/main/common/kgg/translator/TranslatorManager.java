@@ -24,7 +24,7 @@ public class TranslatorManager {
     private static final List<Translator> translators = new LinkedList<>();
 
     private static String from = "auto";
-    private static String to = "zh-cn";
+    private static String to = "zh_cn";
 
     private static final LoadingCache<String, String> cache = CacheBuilder.newBuilder().maximumSize(1000).build(new CacheLoader<>() {
         @Override
