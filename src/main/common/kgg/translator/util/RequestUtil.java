@@ -1,5 +1,6 @@
 package kgg.translator.util;
 
+import com.google.gson.JsonObject;
 import com.mojang.authlib.HttpAuthenticationService;
 
 import java.io.ByteArrayOutputStream;
@@ -22,6 +23,15 @@ public class RequestUtil {
     public static String get(String url, Map<String, Object> params) throws IOException {
         URI uri = URI.create(HttpAuthenticationService.concatenateURL(new URL(url), HttpAuthenticationService.buildQuery(params)).toString());
         HttpRequest request = HttpRequest.newBuilder(uri).GET().build();
+        return send(request, HttpResponse.BodyHandlers.ofString()).body();
+    }
+
+    public static String post(String url, JsonObject body) throws IOException {
+        URI uri = URI.create(url);
+        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder(uri)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body.toString()));
+        HttpRequest request = requestBuilder.build();
         return send(request, HttpResponse.BodyHandlers.ofString()).body();
     }
 
