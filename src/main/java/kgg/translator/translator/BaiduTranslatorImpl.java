@@ -7,7 +7,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.text.Text;
 
-public class BaiduTranslatorImpl extends BaiduTranslator{
+public class BaiduTranslatorImpl extends BaiduTranslator {
     @Override
     public void register(LiteralArgumentBuilder<FabricClientCommandSource> node) {
         node.then(ClientCommandManager.argument("qps", IntegerArgumentType.integer(0))
@@ -19,6 +19,7 @@ public class BaiduTranslatorImpl extends BaiduTranslator{
                     })
                 .then(ClientCommandManager.argument("appId", StringArgumentType.word())
                         .then(ClientCommandManager.argument("appKey", StringArgumentType.word()).executes(context -> {
+                            setDelayTime(1000 / IntegerArgumentType.getInteger(context, "qps"));
                             setConfig(StringArgumentType.getString(context, "appId"), StringArgumentType.getString(context, "appKey"));
                             context.getSource().sendFeedback(Text.literal("OK"));
                             return 0;

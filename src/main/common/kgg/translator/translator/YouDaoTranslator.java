@@ -17,8 +17,8 @@ import java.util.*;
 public abstract class YouDaoTranslator extends Translator {
     public static final String URL = "https://openapi.youdao.com/api";
     private static final String OCR_URL = "https://openapi.youdao.com/ocrtransapi";
-    private String appId;
-    private String appKey;
+    protected String appId = "";
+    protected String appKey = "";
 
     @Override
     public synchronized String translate(String text, String from, String to) throws IOException {

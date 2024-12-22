@@ -4,7 +4,6 @@ import com.google.common.hash.Hashing;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import kgg.translator.command.CommandConfigurable;
 import kgg.translator.exception.ErrorCodeException;
 import kgg.translator.exception.TranslateException;
 import kgg.translator.ocrtrans.ResRegion;
@@ -18,13 +17,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-public abstract class BaiduTranslator extends Translator implements CommandConfigurable {
+public abstract class BaiduTranslator extends Translator {
     public static final String URL = "https://fanyi-api.baidu.com/api/trans/vip/translate";
     public static final String OCR_URL = "https://fanyi-api.baidu.com/api/trans/sdk/picture";
 
-    private String appId;
-    private String appKey;
-    private int delayTime = 1000;
+    protected String appId = "";
+    protected String appKey = "";
+    protected int delayTime = 1000;
 
     @Override
     public synchronized String translate(String text, String from, String to) throws IOException {
