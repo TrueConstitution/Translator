@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "translator",
   "version": "${version}",
-  "name": "翻译器",
+  "name": "Translator",
   "description": "用于翻译聊天，界面，和世界",
   "authors": [
     {
