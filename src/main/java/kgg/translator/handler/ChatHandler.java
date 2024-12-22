@@ -61,8 +61,8 @@ public class ChatHandler {
             * 2.没被点过（点过的是结果）*/
             TranslateClickEvent event = getTranslateClickEvent(text);
             if (event != null && !event.clicked) {
-                text.siblings.removeLast();
-                text.siblings.removeLast();
+                text.siblings.remove(text.siblings.size()-1);
+                text.siblings.remove(text.siblings.size()-1);
             }
         }
         refresh();
@@ -110,7 +110,7 @@ public class ChatHandler {
         if (translatingTexts.contains(text)) {
             return;
         }
-        text.siblings.removeLast();
+        text.siblings.remove(text.siblings.size()-1);
         translate(text);  // 获得没有提示按钮时的文本
         text.siblings.add(TRANSLATING_TIP);
         refresh();
@@ -144,7 +144,7 @@ public class ChatHandler {
 
     @Nullable
     private static TranslateClickEvent getTranslateClickEvent(MutableText text) {
-        if (text.siblings.size() >= 2 && (text.siblings.getLast().getStyle().getClickEvent() instanceof TranslateClickEvent event)) {
+        if (text.siblings.size() >= 2 && (text.siblings.get(text.siblings.size()-1).getStyle().getClickEvent() instanceof TranslateClickEvent event)) {
             return event;
         }
         return null;
