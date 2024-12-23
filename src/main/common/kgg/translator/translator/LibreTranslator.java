@@ -24,7 +24,7 @@ public abstract class LibreTranslator extends Translator {
             params.addProperty("format", "text");
             if (!api_key.isBlank()) params.addProperty("api_key", api_key);
             // 请求
-            String result = RequestUtil.post(libre_url, params);
+            String result = RequestUtil.post(libre_url + "/translate", params);
             JsonObject object = (JsonObject) JsonParser.parseString(result);
             // 解析
             if (object.has("error")) throw new TranslateException(object.get("error").getAsString());
@@ -39,6 +39,7 @@ public abstract class LibreTranslator extends Translator {
     }
 
     public void setConfig(String libre_url, String api_key) {
+        if (libre_url.endsWith("/")) libre_url = libre_url.substring(libre_url.length()-1);
         this.libre_url = libre_url;
         this.api_key = api_key;
         setConfigured();
