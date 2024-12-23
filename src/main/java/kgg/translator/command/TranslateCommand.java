@@ -42,7 +42,7 @@ public class TranslateCommand {
                         .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, result))
                         .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.translatable("translator.translate.copy_result"))));
             } catch (TranslateException e) {
-                message = Text.translatable("translator.translate.error", e.getMessage()).formatted(Formatting.RED);
+                message = Text.translatable("translator.error.translate", e.getMessage()).formatted(Formatting.RED);
             }
             Text finalMessage = message;
             MinecraftClient.getInstance().execute(() -> {

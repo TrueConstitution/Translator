@@ -7,6 +7,7 @@ import kgg.translator.exception.NoTranslatorException;
 import kgg.translator.exception.TranslateException;
 import kgg.translator.exception.NotConfiguredException;
 import kgg.translator.ocrtrans.ResRegion;
+import kgg.translator.option.TranslateOption;
 import kgg.translator.translator.Translator;
 import kgg.translator.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +22,7 @@ import java.util.concurrent.ExecutionException;
 public class TranslatorManager {
     private static final Logger LOGGER = LogManager.getLogger(TranslatorManager.class);
     private static Translator current;
+    private static Translator secondary;
     private static final List<Translator> translators = new LinkedList<>();
 
     private static String from = "auto";
@@ -71,6 +73,10 @@ public class TranslatorManager {
             return translate;
         } catch (Exception e) {
             LOGGER.error("{} translate from {} to {} failed: \"{}\"", translator, from, to, getOutString(text), e);
+            if (TranslateOption.useSecondaryTranslator.isEnable() && getSecondary() != null && getSecondary().isConfigured()) {
+                LOGGER.info("trying secondary translator");
+                return translate(text, getSecondary(), from, to);
+            }
             if (e instanceof TranslateException c) {
                 throw c;
             } else {
@@ -86,6 +92,10 @@ public class TranslatorManager {
             return translator.ocrtrans(img, from, to);
         } catch (Exception e) {
             LOGGER.error("{} ocrtrans, from {} to {} failed:", translator, from, to, e);
+            if (TranslateOption.useSecondaryTranslator.isEnable() && getSecondary() != null && getSecondary().isConfigured()) {
+                LOGGER.info("trying secondary translator");
+                return ocrtrans(translator, img, from, to);
+            }
             if (e instanceof TranslateException c) {
                 throw c;
             } else {
@@ -112,6 +122,10 @@ public class TranslatorManager {
         return current;
     }
 
+    public static Translator getSecondary() {
+        return secondary;
+    }
+
     public static boolean setTranslator(Translator translator) {
         LOGGER.info("Set current translator to {}", translator);
         if (current != translator) {
@@ -135,6 +149,28 @@ public class TranslatorManager {
         return true;
     }
 
+    public static boolean setSecondaryTranslator(Translator translator) {
+        LOGGER.info("Set secondary translator to {}", translator);
+        if (secondary != translator && current != translator) {
+            if (secondary != null && translator.getLanguageProperties() != null && secondary.getLanguageProperties() != null) {
+                String originalFrom = secondary.getLanguageProperties().getKeysByValue(from);
+                String originalTo = secondary.getLanguageProperties().getKeysByValue(to);
+                if (originalFrom != null && originalTo != null) {
+                    String newFrom = translator.getLanguageProperties().getProperty(originalFrom);
+                    String newTo = translator.getLanguageProperties().getProperty(originalTo);
+                    if (newFrom != null && newTo != null) {
+                        setFrom(newFrom);
+                        setTo(newTo);
+                        TranslatorManager.secondary = translator;
+                        return true;
+                    }
+                }
+            }
+            TranslatorManager.secondary = translator;
+            return false;
+        }
+        return true;
+    }
 
     public static void addTranslator(Translator translator) {
         LOGGER.info("Add translator {}", translator);

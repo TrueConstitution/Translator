@@ -1,5 +1,7 @@
 package kgg.translator.screen;
 
+import com.google.gson.JsonObject;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import kgg.translator.TranslatorConfig;
 import kgg.translator.TranslatorManager;
 import kgg.translator.modmenu.ModMenuConfigurable;
@@ -10,14 +12,12 @@ import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.io.IOException;
+import java.util.*;
 
 public class TranslatorScreen {
     public static Screen buildTranslatorScreen(Screen parent) {
@@ -35,20 +35,54 @@ public class TranslatorScreen {
                 category.addEntry(tranCategory.build());
             }
         }
-        Map<String, Translator> translatorMap = TranslatorManager.getTranslators().stream().collect(Collectors.toMap(Translator::getName, t -> t));
-        category.addEntry(entryBuilder.startDropdownMenu(Text.translatable("translator.translation.translator"),
-                TranslatorManager.getCurrent(), translatorMap::get, t -> Text.literal(t.getName()))
+        Map<String, Translator> translatorMap = new HashMap<>();
+        String no_secondary_translator = Text.translatable("translator.translation.no_secondary_translator").getString();
+        Map<String, Translator> translatorMapWithDummy = new HashMap<>(Map.of(no_secondary_translator, new Translator() {
+            @Override
+            public String translate(String text, String from, String to) throws IOException {
+                return text;
+            }
+            @Override
+            public String getName() {
+                return no_secondary_translator;
+            }
+            @Override
+            public void read(JsonObject object) {}
+            @Override
+            public void write(JsonObject object) {}
+            @Override
+            public void register(LiteralArgumentBuilder<FabricClientCommandSource> node) {}
+        }));
+        for (var t : TranslatorManager.getTranslators()) {
+            translatorMap.put(t.getName(), t);
+            translatorMapWithDummy.put(t.getName(), t);
+        }
+        var primary_translator_dropdown = entryBuilder.startDropdownMenu(Text.translatable("translator.translation.primary_translator"),
+                        TranslatorManager.getCurrent(), translatorMap::get, t -> Text.literal(t.getName()))
                 .setSelections(translatorMap.values())
-                .setDefaultValue(TranslatorManager.getCurrent()).setSaveConsumer(TranslatorManager::setTranslator).build());
+                .setDefaultValue(TranslatorManager.getCurrent()).setSaveConsumer(TranslatorManager::setTranslator).build();
+        category.addEntry(primary_translator_dropdown);
 
-        List<String> available_languages = TranslatorManager.getCurrent().getLanguageProperties().keySet().stream().map(o -> (String) o).toList();
+        category.addEntry(entryBuilder.startDropdownMenu(Text.translatable("translator.translation.secondary_translator"),
+                        Optional.ofNullable(TranslatorManager.getSecondary()).orElse(translatorMapWithDummy.get(no_secondary_translator)), translatorMapWithDummy::get, t -> Text.literal(t.getName()))
+                .setSelections(translatorMapWithDummy.values())
+                        .setErrorSupplier(t -> t == primary_translator_dropdown.getValue() ? Optional.of(Text.translatable("translator.error.duplicate_translator")) : Optional.empty())
+                .setDefaultValue(translatorMapWithDummy.get(no_secondary_translator)).setSaveConsumer(TranslatorManager::setSecondaryTranslator).build());
+
+        List<String> available_languages = new ArrayList<>();
+        List<String> available_languages_no_auto = new ArrayList<>();
+        if (TranslatorManager.getCurrent().getLanguageProperties() != null)
+            for (var lang_code : TranslatorManager.getCurrent().getLanguageProperties().keySet()) {
+                available_languages.add((String) lang_code);
+                available_languages_no_auto.add((String) lang_code);
+            }
+        available_languages_no_auto.remove("auto");
         category.addEntry(entryBuilder.startDropdownMenu(Text.translatable("translator.translation.source"),
                         TranslatorManager.getFrom(), LanguageLocalizer::getLanguageCodeFromName, c -> Text.literal(LanguageLocalizer.getLanguageNameFromCode(c)),
                         DropdownMenuBuilder.CellCreatorBuilder.of(c -> Text.literal(LanguageLocalizer.getLanguageNameFromCode(c))))
                 .setSelections(available_languages)
                 .setErrorSupplier(c -> available_languages.contains(c) ? Optional.empty() : Optional.of(Text.translatable("translator.translation.does_not_exist")))
                 .setDefaultValue("").setSaveConsumer(TranslatorManager::setFrom).build());
-        List<String> available_languages_no_auto = available_languages.stream().filter(c -> !"auto".equals(c)).toList();
         category.addEntry(entryBuilder.startDropdownMenu(Text.translatable("translator.translation.target"),
                         TranslatorManager.getTo(), LanguageLocalizer::getLanguageCodeFromName, c -> Text.literal(LanguageLocalizer.getLanguageNameFromCode(c)),
                         DropdownMenuBuilder.CellCreatorBuilder.of(c -> Text.literal(LanguageLocalizer.getLanguageNameFromCode(c))))

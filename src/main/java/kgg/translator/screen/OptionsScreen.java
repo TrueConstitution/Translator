@@ -1,9 +1,6 @@
 package kgg.translator.screen;
 
-import kgg.translator.option.Option;
-import kgg.translator.option.ScreenOption;
-import kgg.translator.option.WorldOption;
-import kgg.translator.option.ChatOption;
+import kgg.translator.option.*;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.option.SimpleOptionsScreen;
@@ -26,7 +23,8 @@ public class OptionsScreen extends SimpleOptionsScreen {
                         createOption(WorldOption.autoEntityName),
                         createOption(WorldOption.autoSign),
                         createOptionAndTooltip(ScreenOption.screenTranslate),
-                        createOptionAndTooltip(WorldOption.signCombine)
+                        createOptionAndTooltip(WorldOption.signCombine),
+                        createOptionAndTooltip(TranslateOption.useSecondaryTranslator)
                 });
     }
 
