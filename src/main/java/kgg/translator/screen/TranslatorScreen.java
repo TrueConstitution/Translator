@@ -15,7 +15,9 @@ import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class TranslatorScreen {
     public static Screen buildTranslatorScreen(Screen parent) {
@@ -33,6 +35,12 @@ public class TranslatorScreen {
                 category.addEntry(tranCategory.build());
             }
         }
+        Map<String, Translator> translatorMap = TranslatorManager.getTranslators().stream().collect(Collectors.toMap(Translator::getName, t -> t));
+        category.addEntry(entryBuilder.startDropdownMenu(Text.translatable("translator.translation.translator"),
+                TranslatorManager.getCurrent(), translatorMap::get, t -> Text.literal(t.getName()))
+                .setSelections(translatorMap.values())
+                .setDefaultValue(TranslatorManager.getCurrent()).setSaveConsumer(TranslatorManager::setTranslator).build());
+
         List<String> available_languages = TranslatorManager.getCurrent().getLanguageProperties().keySet().stream().map(o -> (String) o).toList();
         category.addEntry(entryBuilder.startDropdownMenu(Text.translatable("translator.translation.source"),
                         TranslatorManager.getFrom(), LanguageLocalizer::getLanguageCodeFromName, c -> Text.literal(LanguageLocalizer.getLanguageNameFromCode(c)),

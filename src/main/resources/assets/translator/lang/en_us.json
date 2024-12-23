@@ -40,6 +40,7 @@
     "translator.translation.source": "Source Language",
     "translator.translation.target": "Target Language",
     "translator.translation.does_not_exist": "Language does not exist",
+    "translator.translation.translator": "Use this translator",
 
     "translator.error.baidu.52001": "请求超时，请重试",
     "translator.error.baidu.52002": "服务端系统错误，请重试",
