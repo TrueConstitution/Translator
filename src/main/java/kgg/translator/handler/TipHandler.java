@@ -63,7 +63,7 @@ public class TipHandler {
             int finalI = i;
 
             CompletableFuture.supplyAsync(() -> {
-                if (TextUtil.isSystemText(text)) {
+                if (TextUtil.isSystemText(text) && finalI != 0) { // 第一个文本是物品名
                     return text;
                 }
                 return TranslateHelper.translateNoWait(text);
