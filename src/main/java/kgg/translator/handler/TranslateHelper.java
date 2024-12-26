@@ -1,10 +1,14 @@
 package kgg.translator.handler;
 
 import kgg.translator.TranslatorManager;
+import kgg.translator.option.TranslateOption;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
 
@@ -14,6 +18,16 @@ public class TranslateHelper {
     private static final ConcurrentLinkedQueue<String> translatingTexts = new ConcurrentLinkedQueue<>();
     private static final int MAX_FAILED_TEXT_CACHE_TIME = 1000 * 60 * 2;  // 2分钟
     private static final long CHECK_TIME = 1000 * 60 * 5;  // 5分钟
+    private static int minStyledSegmentSize = -1;
+
+    public static int getMinStyledSegmentSize() {
+        return minStyledSegmentSize;
+    }
+
+    public static void setMinStyledSegmentSize(int minStyledSegmentSize) {
+        TranslateHelper.minStyledSegmentSize = minStyledSegmentSize;
+    }
+
     // 清理线程
     private static final ScheduledExecutorService SCHEDULED_EXECUTOR = Executors.newSingleThreadScheduledExecutor();
     static {
@@ -27,7 +41,20 @@ public class TranslateHelper {
     }
 
     public static Text translateNoWait(Text text, Consumer<String> comparable) {
-        return Text.literal(translateNoWait(text.getString(), comparable)).fillStyle(text.getStyle());
+        MutableText head = Text.literal("");
+        StringBuilder str = new StringBuilder();
+        Style[] lastStyle = new Style[]{text.getStyle()};
+        text.visit((style, asString) -> {
+            str.append(asString);
+            lastStyle[0] = style;
+            if (str.length() >= minStyledSegmentSize) {
+                head.append(Text.literal(translateNoWait(str.toString(), comparable)).setStyle(style));
+                str.setLength(0);
+            }
+            return Optional.empty();
+        }, text.getStyle());
+        if (!str.isEmpty()) head.append(Text.literal(translateNoWait(str.toString(), comparable)).setStyle(lastStyle[0]));
+        return head;
     }
 
     public static String translateNoWait(String text) {

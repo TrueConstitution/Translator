@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import kgg.translator.TranslatorConfig;
 import kgg.translator.TranslatorManager;
+import kgg.translator.handler.TranslateHelper;
 import kgg.translator.modmenu.ModMenuConfigurable;
 import kgg.translator.translator.Translator;
 import kgg.translator.util.LanguageLocalizer;
@@ -89,6 +90,11 @@ public class TranslatorScreen {
                 .setSelections(available_languages_no_auto)
                 .setErrorSupplier(c -> available_languages_no_auto.contains(c) ? Optional.empty() : Optional.of(Text.translatable("translator.translation.does_not_exist")))
                 .setDefaultValue("").setSaveConsumer(TranslatorManager::setTo).build());
+
+        category.addEntry(entryBuilder.startIntField(Text.translatable("translator.option.splitStyledTextIntoSegments.minStyledSegmentSize"),
+                TranslateHelper.getMinStyledSegmentSize())
+                .setMin(-1)
+                .setDefaultValue(-1).setSaveConsumer(TranslateHelper::setMinStyledSegmentSize).build());
 
         builder.setSavingRunnable(() -> {
             runnables.forEach(Runnable::run);

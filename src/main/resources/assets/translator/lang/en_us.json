@@ -21,6 +21,9 @@
     "translator.option.translate_mod_messages.desc": "If on, translate all mod/client-side messages (including this mod's)",
     "translator.option.useSecondaryTranslator": "Use secondary translator",
     "translator.option.useSecondaryTranslator.desc": "When primary translator throws an exception, try to use secondary",
+    "translator.option.splitStyledTextIntoSegments": "Split Styled Text",
+    "translator.option.splitStyledTextIntoSegments.desc": "If on, split styled text into segments and translate each of them individually",
+    "translator.option.splitStyledTextIntoSegments.minStyledSegmentSize": "Minimum segment size for Split Styled Text",
 
     "translator.OptionsScreen.title": "Translator Options",
     "translator.OcrScreen.esc": "Press ESC to cancel",

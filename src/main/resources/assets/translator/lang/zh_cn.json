@@ -21,6 +21,9 @@
   "translator.option.translate_mod_messages.desc": "如果打开，将翻译所有模组/客户端在聊天框的信息（包括这个模组）",
   "translator.option.useSecondaryTranslator": "使用副翻译器",
   "translator.option.useSecondaryTranslator.desc": "当主翻译器报错，尝试使用副翻译器",
+  "translator.option.splitStyledTextIntoSegments": "拆分翻译样式文本",
+  "translator.option.splitStyledTextIntoSegments.desc": "如果打开, 将拆分样式文本并翻译每个片段",
+  "translator.option.splitStyledTextIntoSegments.minStyledSegmentSize": "拆分样式文本最低片段长",
 
   "translator.OptionsScreen.title": "翻译选项",
   "translator.OcrScreen.esc": "按Esc取消",
