@@ -9,6 +9,7 @@ import kgg.translator.exception.NotConfiguredException;
 import kgg.translator.ocrtrans.ResRegion;
 import kgg.translator.option.TranslateOption;
 import kgg.translator.translator.Translator;
+import kgg.translator.util.EasyProperties;
 import kgg.translator.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -66,9 +67,8 @@ public class TranslatorManager {
         if (StringUtil.isBlank(text)) return text;
         if (StringUtils.isNumeric(text)) return text;
         checkTranslator(translator);
-
         try {
-            String translate = translator.translate(text, from, to);
+            String translate = translator.translate(text, (String) translator.getLanguageProperties().getOrDefault(from, from), (String) translator.getLanguageProperties().getOrDefault(to, to));
             LOGGER.info("{} translate from {} to {}: \"{}\" -> \"{}\"", translator, from, to, getOutString(text), getOutString(translate));
             return translate;
         } catch (Exception e) {
@@ -89,7 +89,7 @@ public class TranslatorManager {
         checkTranslator(translator);
         LOGGER.info("{} ocrtrans, from {} to {}", translator, from, to);
         try {
-            return translator.ocrtrans(img, from, to);
+            return translator.ocrtrans(img, (String) translator.getLanguageProperties().getOrDefault(from, from), (String) translator.getLanguageProperties().getOrDefault(to, to));
         } catch (Exception e) {
             LOGGER.error("{} ocrtrans, from {} to {} failed:", translator, from, to, e);
             if (TranslateOption.useSecondaryTranslator.isEnable() && getSecondary() != null && getSecondary().isConfigured()) {
@@ -129,22 +129,7 @@ public class TranslatorManager {
     public static boolean setTranslator(Translator translator) {
         LOGGER.info("Set current translator to {}", translator);
         if (current != translator) {
-            if (current != null && translator.getLanguageProperties() != null && current.getLanguageProperties() != null) {
-                String originalFrom = current.getLanguageProperties().getKeysByValue(from);
-                String originalTo = current.getLanguageProperties().getKeysByValue(to);
-                if (originalFrom != null && originalTo != null) {
-                    String newFrom = translator.getLanguageProperties().getProperty(originalFrom);
-                    String newTo = translator.getLanguageProperties().getProperty(originalTo);
-                    if (newFrom != null && newTo != null) {
-                        setFrom(newFrom);
-                        setTo(newTo);
-                        TranslatorManager.current = translator;
-                        return true;
-                    }
-                }
-            }
             TranslatorManager.current = translator;
-            return false;
         }
         return true;
     }
@@ -152,22 +137,7 @@ public class TranslatorManager {
     public static boolean setSecondaryTranslator(Translator translator) {
         LOGGER.info("Set secondary translator to {}", translator);
         if (secondary != translator && current != translator) {
-            if (secondary != null && translator.getLanguageProperties() != null && secondary.getLanguageProperties() != null) {
-                String originalFrom = secondary.getLanguageProperties().getKeysByValue(from);
-                String originalTo = secondary.getLanguageProperties().getKeysByValue(to);
-                if (originalFrom != null && originalTo != null) {
-                    String newFrom = translator.getLanguageProperties().getProperty(originalFrom);
-                    String newTo = translator.getLanguageProperties().getProperty(originalTo);
-                    if (newFrom != null && newTo != null) {
-                        setFrom(newFrom);
-                        setTo(newTo);
-                        TranslatorManager.secondary = translator;
-                        return true;
-                    }
-                }
-            }
             TranslatorManager.secondary = translator;
-            return false;
         }
         return true;
     }
