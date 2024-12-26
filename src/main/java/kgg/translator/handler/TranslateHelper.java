@@ -36,12 +36,24 @@ public class TranslateHelper {
         }, CHECK_TIME, CHECK_TIME, TimeUnit.MILLISECONDS);
     }
 
-    public static Text translateNoWait(Text text) {
+    public static MutableText translateNoWait(Text text) {
         return translateNoWait(text, s -> {});
     }
 
-    public static Text translateNoWait(Text text, Consumer<String> comparable) {
-        if (!TranslateOption.splitStyledTextIntoSegments.isEnable()) return Text.literal(translateNoWait(text.getString(), comparable)).fillStyle(text.getStyle());
+    public static Text getStyledText(Text text) {
+        var iter = text.getSiblings().iterator();
+        while ((text.getStyle().isEmpty() || text.copyContentOnly().getString().isBlank()) && iter.hasNext()) {
+            text = getStyledText(iter.next());
+        }
+        return text;
+    }
+
+    public static MutableText translateNoWait(Text text, Consumer<String> comparable) {
+        if (!TranslateOption.splitStyledTextIntoSegments.isEnable()) {
+            Style style = getStyledText(text).getStyle();
+            if (style.isEmpty()) style = text.getStyle();
+            return Text.literal(translateNoWait(text.getString(), comparable)).fillStyle(style);
+        }
         MutableText head = Text.literal("");
         StringBuilder str = new StringBuilder();
         Style[] lastStyle = new Style[]{text.getStyle()};
