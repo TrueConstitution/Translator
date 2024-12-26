@@ -49,7 +49,11 @@ public class TranslateHelper {
     }
 
     public static MutableText translateNoWait(Text text, Consumer<String> comparable) {
-        if (!TranslateOption.splitStyledTextIntoSegments.isEnable()) {
+        return translateNoWait(text, comparable, false);
+    }
+
+    public static MutableText translateNoWait(Text text, Consumer<String> comparable, boolean forceDisableSplit) {
+        if (!TranslateOption.splitStyledTextIntoSegments.isEnable() || forceDisableSplit) {
             Style style = getStyledText(text).getStyle();
             if (style.isEmpty()) style = text.getStyle();
             return Text.literal(translateNoWait(text.getString(), comparable)).fillStyle(style);

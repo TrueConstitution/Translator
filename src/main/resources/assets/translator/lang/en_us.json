@@ -25,6 +25,7 @@
     "translator.option.splitStyledTextIntoSegments": "Split Styled Text",
     "translator.option.splitStyledTextIntoSegments.desc": "If on, split styled text into segments and translate each of them individually",
     "translator.option.splitStyledTextIntoSegments.minStyledSegmentSize": "Minimum segment size for Split Styled Text",
+    "translator.option.disableSplitForEntityNames": "Disable segmentation for entity names",
 
     "translator.OptionsScreen.title": "Translator Options",
     "translator.OcrScreen.esc": "Press ESC to cancel",

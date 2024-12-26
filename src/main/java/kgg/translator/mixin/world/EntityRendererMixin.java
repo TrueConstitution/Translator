@@ -1,6 +1,7 @@
 package kgg.translator.mixin.world;
 
 import kgg.translator.handler.TranslateHelper;
+import kgg.translator.option.TranslateOption;
 import kgg.translator.option.WorldOption;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.text.Text;
@@ -18,6 +19,6 @@ public class EntityRendererMixin {
     @ModifyVariable(method = "renderLabelIfPresent", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private Text getText(Text text) {
         if (!WorldOption.autoEntityName.isEnable()) return text;
-        return TranslateHelper.translateNoWait(text);
+        return TranslateHelper.translateNoWait(text, s -> {}, TranslateOption.disableSplitForEntityNames.isEnable());
     }
 }

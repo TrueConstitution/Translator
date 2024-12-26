@@ -26,7 +26,8 @@ public class OptionsScreen extends SimpleOptionsScreen {
                         createOptionAndTooltip(ScreenOption.screenTranslate),
                         createOptionAndTooltip(WorldOption.signCombine),
                         createOptionAndTooltip(TranslateOption.useSecondaryTranslator),
-                        createOptionAndTooltip(TranslateOption.splitStyledTextIntoSegments)
+                        createOptionAndTooltip(TranslateOption.splitStyledTextIntoSegments),
+                        createOption(TranslateOption.disableSplitForEntityNames)
                 });
     }
 
