@@ -17,8 +17,6 @@ import java.util.concurrent.CompletableFuture;
  * 负责翻译工具提示
  */
 public class TipHandler {
-    private static final Logger LOGGER = LogManager.getLogger(TipHandler.class);
-
     public static boolean drawTranslateText = false;  // 需要画翻译
     private static OrderedText[] translatedOrderedText;  // 翻译后的文本
     private static int translatedTextCount;
@@ -62,22 +60,16 @@ public class TipHandler {
 
         for (int i = 0; i < texts.size(); i++) {
             Text text = texts.get(i);
-            String string = text.getString();
             int finalI = i;
 
             CompletableFuture.supplyAsync(() -> {
                 if (TextUtil.isSystemText(text)) {
-                    return string;
+                    return text;
                 }
-                try {
-                    return TranslatorManager.cachedTranslate(string);
-                } catch (TranslateException e) {
-                    LOGGER.error("translate failed", e);
-                    return string;
-                }
+                return TranslateHelper.translateNoWait(text);
             }).thenApply(trans -> {
-                temp[finalI] = OrderedText.styledForwardsVisitedString(trans, text.getStyle());
-                if (StringUtil.equals(trans, string)) {
+                temp[finalI] = trans.asOrderedText();
+                if (StringUtil.equals(trans.getString(), text.getString())) {
                     noTranslateCount++;
                 }
                 translatedTextCount++;
