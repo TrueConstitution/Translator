@@ -41,6 +41,7 @@ public class TranslateHelper {
     }
 
     public static Text translateNoWait(Text text, Consumer<String> comparable) {
+        if (!TranslateOption.splitStyledTextIntoSegments.isEnable()) return Text.literal(translateNoWait(text.getString(), comparable)).fillStyle(text.getStyle());
         MutableText head = Text.literal("");
         StringBuilder str = new StringBuilder();
         Style[] lastStyle = new Style[]{text.getStyle()};
