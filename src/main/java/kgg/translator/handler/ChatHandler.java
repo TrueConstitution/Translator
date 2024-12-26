@@ -90,12 +90,14 @@ public class ChatHandler {
         CompletableFuture.supplyAsync(() -> {
             try {
                 String result = TranslatorManager.cachedTranslate(s);
+                if (s.equals(result)) return text;
                 return createResultText(result, text);
             } catch (Exception e) {
                 return createErrorText(e.getMessage(), text, s);
             }
         }).thenAccept(result -> {
             translatingTexts.remove(text);
+            if (text.equals(result)) return;
             TranslateClickEvent event = getTranslateClickEvent(text);
             if (event != null) {
                 text.siblings.set(text.siblings.size() - 1, result);
