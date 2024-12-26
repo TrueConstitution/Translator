@@ -17,6 +17,7 @@
     "hud.BossBarHudMixin",
     "hud.ChatHudMixin",
     "hud.ChatScreenMixin",
+    "hud.InGameHudForHeldItem",
     "hud.InGameHudForScoreboardMixin",
     "hud.InGameHudForTitleMixin",
     "screen.BookScreenMixin",

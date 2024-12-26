@@ -5,6 +5,7 @@
     "translator.option.chat_tip": "Translate chat button",
     "translator.option.auto_chat": "Auto translate chat",
     "translator.option.auto_tooltip": "Auto translate item tooltips",
+    "translator.option.auto_held_item_name": "Auto translate held item name",
     "translator.option.auto_title": "Auto translate titles",
     "translator.option.auto_scoreboard": "Auto translate scoreboards",
     "translator.option.auto_boss_bar": "Auto translate bossbars",

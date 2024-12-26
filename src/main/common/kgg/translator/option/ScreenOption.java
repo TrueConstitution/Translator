@@ -6,6 +6,7 @@ public class ScreenOption {
     public static final Option autoScoreboard = new Option("auto_scoreboard", false);
     public static final Option autoBossBar = new Option("auto_boss_bar", false);
     public static final Option screenTranslate = new Option("screen_translate", false);
+    public static final Option autoHeldItemName = new Option("auto_held_item_name", false);
 
     public static void register() {}
 }

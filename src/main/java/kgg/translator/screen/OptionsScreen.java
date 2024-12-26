@@ -20,6 +20,7 @@ public class OptionsScreen extends SimpleOptionsScreen {
                         createOption(ScreenOption.autoScoreboard),
                         createOption(ScreenOption.autoBossBar),
                         createOptionAndTooltip(ScreenOption.autoTooltip),
+                        createOption(ScreenOption.autoHeldItemName),
                         createOption(WorldOption.autoEntityName),
                         createOption(WorldOption.autoSign),
                         createOptionAndTooltip(ScreenOption.screenTranslate),
