@@ -1,5 +1,6 @@
 package kgg.translator.mixin.world;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import kgg.translator.handler.SignHandler;
 import kgg.translator.handler.TranslateHelper;
 import kgg.translator.option.WorldOption;
@@ -10,10 +11,13 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 import java.util.function.Function;
@@ -31,36 +35,8 @@ public abstract class SignTextMixin {
     @Unique
     private boolean updated = false;
 
-    /**
-     * @author KGG_Xing_Kong
-     * @reason 翻译
-     * 按照原本的getOrderedMessages的逻辑，只有在文本发生变更时才更改orderedMessages
-     */
-    @Overwrite
-    public OrderedText[] getOrderedMessages(boolean filtered, Function<Text, OrderedText> messageOrderer) {
-        updateFlags();
-
-        if (orderedMessages == null || filtered!= this.filtered) {
-            this.filtered = filtered;
-            orderedMessages = new OrderedText[4];
-            if (autoSign && !(MinecraftClient.getInstance().currentScreen instanceof AbstractSignEditScreen)) {
-                if (signCombine) {
-                    handleCombinedTranslation();
-                } else {
-                    handleLineByLineTranslation();
-                }
-            } else {
-                for (int i = 0; i < 4; ++i) {
-                    Text message = getMessage(i, filtered);
-                    orderedMessages[i] = messageOrderer.apply(message);
-                }
-            }
-        }
-        return orderedMessages;
-    }
-
-    @Unique
-    private void updateFlags() {
+    @Inject(method = "getOrderedMessages", at = @At("HEAD"))
+    private void updateFlags(boolean filtered, Function<Text, OrderedText> messageOrderer, CallbackInfoReturnable<OrderedText[]> cir) {
         if (autoSign!= WorldOption.autoSign.isEnable() || signCombine!= WorldOption.signCombine.isEnable()) {
             autoSign = WorldOption.autoSign.isEnable();
             signCombine = WorldOption.signCombine.isEnable();
@@ -69,6 +45,33 @@ public abstract class SignTextMixin {
         if (updated) {
             updated = false;
             orderedMessages = null;
+        }
+    }
+
+    @Unique
+    private boolean shouldTranslate() {
+        return autoSign && !(MinecraftClient.getInstance().currentScreen instanceof AbstractSignEditScreen);
+    }
+
+    @ModifyExpressionValue(method = "getOrderedMessages", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/SignText;getMessage(IZ)Lnet/minecraft/text/Text;"))
+    private Text modifySignTextIndividually(Text original) {
+        if (signCombine || shouldTranslate()) return original;
+        return TranslateHelper.translateNoWait(original);
+    }
+
+    @Inject(
+            method = "getOrderedMessages",
+            at = @At(value = "FIELD",
+                    target = "Lnet/minecraft/block/entity/SignText;orderedMessages:[Lnet/minecraft/text/OrderedText;",
+                    opcode = Opcodes.PUTFIELD,
+                    shift = At.Shift.AFTER),
+            cancellable = true
+    )
+    private void modifySignTextCombined(boolean filtered, Function<Text, OrderedText> messageOrderer, CallbackInfoReturnable<OrderedText[]> cir) {
+        if (signCombine && shouldTranslate()) {
+            handleCombinedTranslation();
+            cir.setReturnValue(orderedMessages);
+            cir.cancel();
         }
     }
 
@@ -87,15 +90,6 @@ public abstract class SignTextMixin {
             } else {
                 orderedMessages[i] = OrderedText.empty();
             }
-        }
-    }
-
-    @Unique
-    private void handleLineByLineTranslation() {
-        for (int i = 0; i < 4; ++i) {
-            Text message = getMessage(i, filtered);
-            message = TranslateHelper.translateNoWait(message, t -> updated = true);
-            orderedMessages[i] = message.asOrderedText();
         }
     }
 }
