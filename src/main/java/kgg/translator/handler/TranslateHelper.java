@@ -31,9 +31,7 @@ public class TranslateHelper {
     // 清理线程
     private static final ScheduledExecutorService SCHEDULED_EXECUTOR = Executors.newSingleThreadScheduledExecutor();
     static {
-        SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> {
-            failedTextCache.entrySet().removeIf(entry -> System.currentTimeMillis() - entry.getValue() > MAX_FAILED_TEXT_CACHE_TIME);
-        }, CHECK_TIME, CHECK_TIME, TimeUnit.MILLISECONDS);
+        SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> failedTextCache.entrySet().removeIf(entry -> System.currentTimeMillis() - entry.getValue() > MAX_FAILED_TEXT_CACHE_TIME), CHECK_TIME, CHECK_TIME, TimeUnit.MILLISECONDS);
     }
 
     public static MutableText translateNoWait(Text text) {

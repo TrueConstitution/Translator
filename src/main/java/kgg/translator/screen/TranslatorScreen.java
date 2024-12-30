@@ -21,6 +21,23 @@ import java.io.IOException;
 import java.util.*;
 
 public class TranslatorScreen {
+    private static String no_secondary_translator;
+    private static final Translator dummy = new Translator() {
+        @Override
+        public String translate(String text, String from, String to) throws IOException {
+            return text;
+        }
+        @Override
+        public String getName() {
+            return no_secondary_translator;
+        }
+        @Override
+        public void read(JsonObject object) {}
+        @Override
+        public void write(JsonObject object) {}
+        @Override
+        public void register(LiteralArgumentBuilder<FabricClientCommandSource> node) {}
+    };
     public static Screen buildTranslatorScreen(Screen parent) {
         ConfigBuilder builder = ConfigBuilder.create().setTitle(Text.translatable("translator.OptionsScreen.title")).setParentScreen(parent);
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
@@ -37,23 +54,8 @@ public class TranslatorScreen {
             }
         }
         Map<String, Translator> translatorMap = new HashMap<>();
-        String no_secondary_translator = Text.translatable("translator.translation.no_secondary_translator").getString();
-        Map<String, Translator> translatorMapWithDummy = new HashMap<>(Map.of(no_secondary_translator, new Translator() {
-            @Override
-            public String translate(String text, String from, String to) throws IOException {
-                return text;
-            }
-            @Override
-            public String getName() {
-                return no_secondary_translator;
-            }
-            @Override
-            public void read(JsonObject object) {}
-            @Override
-            public void write(JsonObject object) {}
-            @Override
-            public void register(LiteralArgumentBuilder<FabricClientCommandSource> node) {}
-        }));
+        no_secondary_translator = Text.translatable("translator.translation.no_secondary_translator").getString();
+        Map<String, Translator> translatorMapWithDummy = new HashMap<>(Map.of(no_secondary_translator, dummy));
         for (var t : TranslatorManager.getTranslators()) {
             translatorMap.put(t.getName(), t);
             translatorMapWithDummy.put(t.getName(), t);
