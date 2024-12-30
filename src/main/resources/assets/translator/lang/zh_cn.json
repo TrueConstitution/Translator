@@ -1,4 +1,7 @@
 {
+  "modmenu.nameTranslation.translator": "翻译器",
+  "modmenu.descriptionTranslation.translator": "用于翻译聊天，界面，和世界",
+
   "key.categories.translator": "翻译器",
   "key.translator.options": "打开选项",
   "key.translator.ocr": "屏幕识别",

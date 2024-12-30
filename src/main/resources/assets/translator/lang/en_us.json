@@ -1,4 +1,7 @@
 {
+    "modmenu.nameTranslation.translator": "Translator",
+    "modmenu.descriptionTranslation.translator": "Translate chat, screens, and world",
+
     "key.categories.translator": "translator",
     "key.translator.options": "options screen",
     "key.translator.ocr": "ocr",
