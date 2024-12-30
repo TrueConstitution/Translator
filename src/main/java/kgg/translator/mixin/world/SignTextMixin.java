@@ -55,7 +55,7 @@ public abstract class SignTextMixin {
 
     @ModifyExpressionValue(method = "getOrderedMessages", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/SignText;getMessage(IZ)Lnet/minecraft/text/Text;"))
     private Text modifySignTextIndividually(Text original) {
-        if (signCombine || shouldTranslate()) return original;
+        if (signCombine || !shouldTranslate()) return original;
         return TranslateHelper.translateNoWait(original);
     }
 
