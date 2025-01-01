@@ -10,6 +10,7 @@ import kgg.translator.ocrtrans.ResRegion;
 import kgg.translator.option.TranslateOption;
 import kgg.translator.translator.Translator;
 import kgg.translator.util.EasyProperties;
+import kgg.translator.util.LanguageUtil;
 import kgg.translator.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -64,8 +65,7 @@ public class TranslatorManager {
     }
 
     public static String translate(String text, Translator translator, String from, String to) throws TranslateException {
-        if (StringUtil.isBlank(text)) return text;
-        if (StringUtils.isNumeric(text)) return text;
+        if (StringUtil.isBlank(text) || StringUtils.isNumeric(text) || !LanguageUtil.Language.containsLangUnicodeChars(text, from)) return text;
         checkTranslator(translator);
         try {
             String translate = translator.translate(text, (String) translator.getLanguageProperties().getOrDefault(from, from), (String) translator.getLanguageProperties().getOrDefault(to, to));
