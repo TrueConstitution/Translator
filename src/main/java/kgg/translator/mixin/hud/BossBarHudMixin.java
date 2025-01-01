@@ -12,6 +12,6 @@ import org.spongepowered.asm.mixin.injection.At;
 public class BossBarHudMixin {
     @ModifyExpressionValue(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/ClientBossBar;getName()Lnet/minecraft/text/Text;"))
     public Text render(Text original) {
-        return ScreenOption.autoBossBar.isEnable() ? TranslateHelper.translateNoWait(original) : original;
+        return ScreenOption.autoBossBar.isEnable() ? TranslateHelper.translateNow(original) : original;
     }
 }

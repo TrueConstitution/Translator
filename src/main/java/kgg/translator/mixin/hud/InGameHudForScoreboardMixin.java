@@ -13,11 +13,11 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class InGameHudForScoreboardMixin {
     @ModifyExpressionValue(method = "renderScoreboardSidebar", at = @At(value = "INVOKE", target = "Lnet/minecraft/scoreboard/ScoreboardObjective;getDisplayName()Lnet/minecraft/text/Text;"))
     private Text modifyObjectiveName(Text original) {
-        return ScreenOption.autoScoreboard.isEnable() ? TranslateHelper.translateNoWait(original) : original;
+        return ScreenOption.autoScoreboard.isEnable() ? TranslateHelper.translateNow(original) : original;
     }
 
     @ModifyExpressionValue(method = "renderScoreboardSidebar", at = @At(value = "INVOKE", target = "Lnet/minecraft/scoreboard/Team;decorateName(Lnet/minecraft/scoreboard/AbstractTeam;Lnet/minecraft/text/Text;)Lnet/minecraft/text/MutableText;"))
     private MutableText modifyPlayerName(MutableText original) {
-        return ScreenOption.autoScoreboard.isEnable() ? TranslateHelper.translateNoWait(original) : original;
+        return ScreenOption.autoScoreboard.isEnable() ? (MutableText) TranslateHelper.translateNow(original) : original;
     }
 }

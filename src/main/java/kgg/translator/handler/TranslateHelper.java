@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 public class TranslateHelper {
     private static final Logger LOGGER = LogManager.getLogger(TranslateHelper.class);
     private static final ConcurrentHashMap<String, Long> failedTextCache = new ConcurrentHashMap<>();
-    private static final ConcurrentLinkedQueue<String> translatingTexts = new ConcurrentLinkedQueue<>();
+    private static final ConcurrentHashMap<String, CompletableFuture<String>> ongoingTranslations = new ConcurrentHashMap<>();
     private static final int MAX_FAILED_TEXT_CACHE_TIME = 1000 * 60 * 2;  // 2分钟
     private static final long CHECK_TIME = 1000 * 60 * 5;  // 5分钟
     private static int minStyledSegmentSize = -1;
@@ -34,8 +34,8 @@ public class TranslateHelper {
         SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> failedTextCache.entrySet().removeIf(entry -> System.currentTimeMillis() - entry.getValue() > MAX_FAILED_TEXT_CACHE_TIME), CHECK_TIME, CHECK_TIME, TimeUnit.MILLISECONDS);
     }
 
-    public static MutableText translateNoWait(Text text) {
-        return translateNoWait(text, s -> {});
+    public static Text translateNow(Text text) {
+        return translateAsync(text, s -> {}).getNow(text);
     }
 
     public static Text getStyledText(Text text) {
@@ -46,67 +46,65 @@ public class TranslateHelper {
         return text;
     }
 
-    public static MutableText translateNoWait(Text text, Consumer<String> comparable) {
-        return translateNoWait(text, comparable, false);
+    public static CompletableFuture<Text> translateAsync(Text text, Consumer<String> comparable) {
+        return translateAsync(text, comparable, false);
     }
 
-    public static MutableText translateNoWait(Text text, Consumer<String> comparable, boolean forceDisableSplit) {
+    public static CompletableFuture<Text> translateAsync(Text text, Consumer<String> comparable, boolean forceDisableSplit) {
         if (!TranslateOption.splitStyledTextIntoSegments.isEnable() || forceDisableSplit) {
             Style style = getStyledText(text).getStyle();
-            if (style.isEmpty()) style = text.getStyle();
-            return Text.literal(translateNoWait(text.getString(), comparable)).fillStyle(style);
+            Style finalStyle = style.isEmpty() ? text.getStyle() : style;
+            return translateAsync(text.getString(), comparable).thenApply(s -> Text.literal(s).fillStyle(finalStyle));
         }
-        MutableText head = Text.literal("");
-        StringBuilder str = new StringBuilder();
-        Style[] lastStyle = new Style[]{text.getStyle()};
-        text.visit((style, asString) -> {
-            str.append(asString);
-            lastStyle[0] = style;
-            if (str.length() >= minStyledSegmentSize) {
-                head.append(Text.literal(translateNoWait(str.toString(), comparable)).setStyle(style));
-                str.setLength(0);
-            }
-            return Optional.empty();
-        }, text.getStyle());
-        if (!str.isEmpty()) head.append(Text.literal(translateNoWait(str.toString(), comparable)).setStyle(lastStyle[0]));
-        return head;
+        return CompletableFuture.supplyAsync(() -> {
+            MutableText head = Text.literal("");
+            StringBuilder str = new StringBuilder();
+            Style[] lastStyle = new Style[]{text.getStyle()};
+            text.visit((style, asString) -> {
+                str.append(asString);
+                lastStyle[0] = style;
+                if (str.length() >= minStyledSegmentSize) {
+                    head.append(Text.literal(translateAsync(str.toString(), comparable).join()).setStyle(style));
+                    str.setLength(0);
+                }
+                return Optional.empty();
+            }, text.getStyle());
+            if (!str.isEmpty()) head.append(Text.literal(translateAsync(str.toString(), comparable).join()).setStyle(lastStyle[0]));
+            return head;
+        });
     }
 
-    public static String translateNoWait(String text) {
-        return translateNoWait(text, s -> {});
-    }
-
-    public static String translateNoWait(String text, Consumer<String> comparable) {
-        // 检查此文本
+    public static CompletableFuture<String> translateAsync(String text, Consumer<String> comparable) {
         Long aLong = failedTextCache.get(text);
         if (aLong != null) {
             if (System.currentTimeMillis() - aLong > MAX_FAILED_TEXT_CACHE_TIME) {
                 failedTextCache.remove(text);
             } else {
-                return text;
+                return CompletableFuture.completedFuture(text);
             }
         }
 
         String cache = TranslatorManager.getFromCache(text);
         if (cache != null) {
-            return cache;
-        }
-        if (translatingTexts.contains(text)) {
-            return text;
+            return CompletableFuture.completedFuture(cache);
         }
 
-        translatingTexts.add(text);
-        CompletableFuture.runAsync(() -> {
-            try {
-                String s = TranslatorManager.cachedTranslate(text);
-                comparable.accept(s);
-            } catch (Exception e) {
-                failedTextCache.put(text, System.currentTimeMillis());
-            } finally {
-                translatingTexts.remove(text);
-            }
+        return ongoingTranslations.computeIfAbsent(text, k -> {
+            CompletableFuture<String> future = new CompletableFuture<>();
+            CompletableFuture.runAsync(() -> {
+                try {
+                    String result = TranslatorManager.cachedTranslate(text);
+                    comparable.accept(result);
+                    future.complete(result);
+                } catch (Exception e) {
+                    failedTextCache.put(text, System.currentTimeMillis());
+                    future.complete(text);
+                } finally {
+                    ongoingTranslations.remove(text);
+                }
+            });
+            return future;
         });
-        return text;
     }
 
     public static void clearCache() {

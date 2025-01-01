@@ -56,7 +56,7 @@ public abstract class SignTextMixin {
     @ModifyExpressionValue(method = "getOrderedMessages", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/entity/SignText;getMessage(IZ)Lnet/minecraft/text/Text;"))
     private Text modifySignTextIndividually(Text original) {
         if (signCombine || !shouldTranslate()) return original;
-        return TranslateHelper.translateNoWait(original);
+        return TranslateHelper.translateNow(original);
     }
 
     @Inject(
@@ -81,7 +81,7 @@ public abstract class SignTextMixin {
         for (int i = 1; i < 4; ++i) {
             text.append(getMessage(i, filtered));
         }
-        Text combinedMessage = TranslateHelper.translateNoWait(text, t -> updated = true);
+        Text combinedMessage = TranslateHelper.translateAsync(text, t -> updated = true).getNow(text);
 
         List<OrderedText> list = MinecraftClient.getInstance().textRenderer.wrapLines(combinedMessage, SignHandler.lineWidth);
         for (int i = 0; i < 4; ++i) {

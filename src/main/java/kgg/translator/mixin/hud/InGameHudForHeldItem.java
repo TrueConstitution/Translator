@@ -12,6 +12,6 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class InGameHudForHeldItem {
     @ModifyExpressionValue(method = "renderHeldItemTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/text/MutableText;formatted(Lnet/minecraft/util/Formatting;)Lnet/minecraft/text/MutableText;", ordinal = 0))
     private MutableText modifyHeldItemRenderName(MutableText original) {
-        return ScreenOption.autoHeldItemName.isEnable() ? TranslateHelper.translateNoWait(original) : original;
+        return ScreenOption.autoHeldItemName.isEnable() ? (MutableText) TranslateHelper.translateNow(original) : original;
     }
 }

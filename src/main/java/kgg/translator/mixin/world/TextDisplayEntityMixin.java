@@ -32,9 +32,7 @@ public class TextDisplayEntityMixin {
 
         return (text, w) -> {
             if (translated){
-                text = TranslateHelper.translateNoWait(text, t -> {
-                    updated = true;
-                });
+                text = TranslateHelper.translateAsync(text, t -> updated = true).getNow(text);
             }
             return splitter.split(text, w);
         };

@@ -1,15 +1,11 @@
 package kgg.translator.handler;
 
-import kgg.translator.TranslatorManager;
-import kgg.translator.exception.TranslateException;
 import kgg.translator.util.StringUtil;
 import kgg.translator.util.TextUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -66,7 +62,7 @@ public class TipHandler {
                 if (TextUtil.isSystemText(text) && finalI != 0) { // 第一个文本是物品名
                     return text;
                 }
-                return TranslateHelper.translateNoWait(text);
+                return TranslateHelper.translateNow(text);
             }).thenApply(trans -> {
                 temp[finalI] = trans.asOrderedText();
                 if (StringUtil.equals(trans.getString(), text.getString())) {
@@ -80,8 +76,5 @@ public class TipHandler {
 
     public static OrderedText[] getTranslatedOrderedText() {
         return translatedOrderedText;
-    }
-
-    public record SidebarEntry(Text name, Text score, int scoreWidth) {
     }
 }
