@@ -81,7 +81,7 @@ public abstract class SignTextMixin {
         for (int i = 1; i < 4; ++i) {
             text.append(getMessage(i, filtered));
         }
-        Text combinedMessage = TranslateHelper.translateAsync(text, t -> updated = true).getNow(text);
+        Text combinedMessage = TranslateHelper.translateNow(text, t -> updated = true);
 
         List<OrderedText> list = MinecraftClient.getInstance().textRenderer.wrapLines(combinedMessage, SignHandler.lineWidth);
         for (int i = 0; i < 4; ++i) {

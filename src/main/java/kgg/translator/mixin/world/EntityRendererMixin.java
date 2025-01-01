@@ -19,6 +19,6 @@ public class EntityRendererMixin {
     @ModifyVariable(method = "renderLabelIfPresent", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private Text getText(Text text) {
         if (!WorldOption.autoEntityName.isEnable()) return text;
-        return TranslateHelper.translateAsync(text, s -> {}, TranslateOption.disableSplitForEntityNames.isEnable()).getNow(text);
+        return TranslateHelper.translateText(text, s -> {}, TranslateOption.disableSplitForEntityNames.isEnable(), false);
     }
 }

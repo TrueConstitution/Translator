@@ -34,10 +34,6 @@ public class TranslateHelper {
         SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> failedTextCache.entrySet().removeIf(entry -> System.currentTimeMillis() - entry.getValue() > MAX_FAILED_TEXT_CACHE_TIME), CHECK_TIME, CHECK_TIME, TimeUnit.MILLISECONDS);
     }
 
-    public static Text translateNow(Text text) {
-        return translateAsync(text, s -> {}).getNow(text);
-    }
-
     public static Text getStyledText(Text text) {
         var iter = text.getSiblings().iterator();
         while ((text.getStyle().isEmpty() || text.copyContentOnly().getString().isBlank()) && iter.hasNext()) {
@@ -45,33 +41,40 @@ public class TranslateHelper {
         }
         return text;
     }
-
-    public static CompletableFuture<Text> translateAsync(Text text, Consumer<String> comparable) {
-        return translateAsync(text, comparable, false);
+    
+    public static Text translateNow(Text text) {
+        return translateNow(text, s -> {});
     }
 
-    public static CompletableFuture<Text> translateAsync(Text text, Consumer<String> comparable, boolean forceDisableSplit) {
+    public static Text translateNow(Text text, Consumer<String> comparable) {
+        return translateText(text, comparable, false, false);
+    }
+
+    public static Text translateText(Text text, Consumer<String> comparable, boolean forceDisableSplit, boolean wait) {
         if (!TranslateOption.splitStyledTextIntoSegments.isEnable() || forceDisableSplit) {
             Style style = getStyledText(text).getStyle();
             Style finalStyle = style.isEmpty() ? text.getStyle() : style;
-            return translateAsync(text.getString(), comparable).thenApply(s -> Text.literal(s).fillStyle(finalStyle));
+            var fut = translateAsync(text.getString(), comparable);
+            return Text.literal(wait ? fut.join() : fut.getNow(text.getString())).fillStyle(finalStyle);
         }
-        return CompletableFuture.supplyAsync(() -> {
-            MutableText head = Text.literal("");
-            StringBuilder str = new StringBuilder();
-            Style[] lastStyle = new Style[]{text.getStyle()};
-            text.visit((style, asString) -> {
-                str.append(asString);
-                lastStyle[0] = style;
-                if (str.length() >= minStyledSegmentSize) {
-                    head.append(Text.literal(translateAsync(str.toString(), comparable).join()).setStyle(style));
-                    str.setLength(0);
-                }
-                return Optional.empty();
-            }, text.getStyle());
-            if (!str.isEmpty()) head.append(Text.literal(translateAsync(str.toString(), comparable).join()).setStyle(lastStyle[0]));
-            return head;
-        });
+        MutableText head = Text.literal("");
+        StringBuilder str = new StringBuilder();
+        Style[] lastStyle = new Style[]{text.getStyle()};
+        text.visit((style, asString) -> {
+            str.append(asString);
+            lastStyle[0] = style;
+            if (str.length() >= minStyledSegmentSize) {
+                var fut = translateAsync(str.toString(), comparable);
+                head.append(Text.literal(wait ? fut.join() : fut.getNow(str.toString())).setStyle(style));
+                str.setLength(0);
+            }
+            return Optional.empty();
+        }, text.getStyle());
+        if (!str.isEmpty()) {
+            var fut = translateAsync(str.toString(), comparable);
+            head.append(Text.literal(wait ? fut.join() : fut.getNow(str.toString())).setStyle(lastStyle[0]));
+        }
+        return head;
     }
 
     public static CompletableFuture<String> translateAsync(String text, Consumer<String> comparable) {
