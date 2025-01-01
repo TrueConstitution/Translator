@@ -9,7 +9,6 @@ import kgg.translator.exception.NotConfiguredException;
 import kgg.translator.ocrtrans.ResRegion;
 import kgg.translator.option.TranslateOption;
 import kgg.translator.translator.Translator;
-import kgg.translator.util.EasyProperties;
 import kgg.translator.util.LanguageUtil;
 import kgg.translator.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -159,6 +158,7 @@ public class TranslatorManager {
     }
 
     public static void setTo(String defaultTo) {
+        if (!to.equals(defaultTo)) clearCache();
         TranslatorManager.to = defaultTo;
     }
 
