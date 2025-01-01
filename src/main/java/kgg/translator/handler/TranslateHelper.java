@@ -79,7 +79,7 @@ public class TranslateHelper {
             var fut = translateAsync(str.toString(), comparable);
             head.append(Text.literal(wait ? fut.join() : fut.getNow(str.toString())).setStyle(lastStyle[0]));
         }
-        return head.getSiblings().size() == 1 ? head.getSiblings().get(0) : head;
+        return head.getSiblings().size() == 1 && head.getSiblings().get(0).getStyle().equals(head.getStyle()) ? head.getSiblings().get(0) : head;
     }
 
     public static CompletableFuture<String> translateAsync(String text, Consumer<String> comparable) {
