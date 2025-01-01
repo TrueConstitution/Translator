@@ -6,6 +6,7 @@ import kgg.translator.TranslatorConfig;
 import kgg.translator.TranslatorManager;
 import kgg.translator.handler.TranslateHelper;
 import kgg.translator.modmenu.ModMenuConfigurable;
+import kgg.translator.option.WorldOption;
 import kgg.translator.translator.Translator;
 import kgg.translator.util.LanguageUtil;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
@@ -97,6 +98,12 @@ public class TranslatorScreen {
                 TranslateHelper.getMinStyledSegmentSize())
                 .setMin(-1)
                 .setDefaultValue(-1).setSaveConsumer(TranslateHelper::setMinStyledSegmentSize).build());
+
+        category.addEntry(entryBuilder.startIntField(Text.translatable("translator.option.auto_entity_name.maxDist"),
+                        WorldOption.autoEntityName_maxDist)
+                .setMin(64)
+                .setDefaultValue(128)
+                .setSaveConsumer(i -> WorldOption.autoEntityName_maxDist = i).build());
 
         builder.setSavingRunnable(() -> {
             runnables.forEach(Runnable::run);

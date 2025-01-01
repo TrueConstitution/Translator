@@ -13,6 +13,7 @@
     "translator.option.auto_scoreboard": "Auto translate scoreboards",
     "translator.option.auto_boss_bar": "Auto translate bossbars",
     "translator.option.auto_entity_name": "Auto translate entity names",
+    "translator.option.auto_entity_name.maxDist": "Auto translate entity names max distance",
     "translator.option.auto_sign": "Auto translate signs",
     "translator.option.sign_combine": "Combine sign lines",
     "translator.option.screen_translate": "Auto translate GUIs",

@@ -13,6 +13,7 @@
   "translator.option.auto_scoreboard": "自动翻译计分板",
   "translator.option.auto_boss_bar": "自动翻译boss栏",
   "translator.option.auto_entity_name": "自动翻译实体名",
+  "translator.option.auto_entity_name.maxDist": "自动翻译实体名最远距离",
   "translator.option.auto_sign": "自动翻译告示牌",
   "translator.option.sign_combine": "告示牌结合翻译",
   "translator.option.screen_translate": "界面翻译",

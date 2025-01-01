@@ -3,6 +3,7 @@ package kgg.translator;
 import com.google.gson.*;
 import kgg.translator.handler.TranslateHelper;
 import kgg.translator.option.Option;
+import kgg.translator.option.WorldOption;
 import kgg.translator.util.ConfigUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -56,6 +57,7 @@ public class TranslatorConfig {
         config.addProperty("current", TranslatorManager.getCurrent().getName());
         config.addProperty("secondary", TranslatorManager.getSecondary().getName());
         config.addProperty("minStyledSegmentSize", TranslateHelper.getMinStyledSegmentSize());
+        config.addProperty("auto_entity_name.maxDist", WorldOption.autoEntityName_maxDist);
         TranslatorManager.getTranslators().forEach(translator -> {
             if (translator.isConfigured()) {
                 JsonObject object = new JsonObject();
@@ -74,6 +76,7 @@ public class TranslatorConfig {
             String currentTranslator = config.get("current").getAsString();
             String secondaryTranslator = config.get("secondary").getAsString();
             TranslateHelper.setMinStyledSegmentSize(config.get("minStyledSegmentSize").getAsInt());
+            WorldOption.autoEntityName_maxDist = config.get("auto_entity_name.maxDist").getAsInt();
             TranslatorManager.getTranslators().forEach(translator -> {
                 JsonElement element = config.get(translator.getName());
                 if (element != null) {
