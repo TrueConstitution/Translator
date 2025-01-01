@@ -62,7 +62,7 @@ public class TipHandler {
                 if (TextUtil.isSystemText(text) && finalI != 0) { // 第一个文本是物品名
                     return text;
                 }
-                return TranslateHelper.translateNow(text);
+                return TranslateHelper.translateAsync(text, s -> {}).join();z
             }).thenApply(trans -> {
                 temp[finalI] = trans.asOrderedText();
                 if (StringUtil.equals(trans.getString(), text.getString())) {
