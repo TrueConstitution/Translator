@@ -101,6 +101,7 @@ public class TranslatorScreen {
         builder.setSavingRunnable(() -> {
             runnables.forEach(Runnable::run);
             TranslatorConfig.writeFile();
+            TranslateHelper.clearCache();
         });
         return builder.build();
     }
