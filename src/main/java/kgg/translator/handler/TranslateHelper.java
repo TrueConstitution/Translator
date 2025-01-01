@@ -61,20 +61,25 @@ public class TranslateHelper {
         StringBuilder str = new StringBuilder();
         Style[] lastStyle = new Style[]{text.getStyle()};
         text.visit((style, asString) -> {
-            str.append(asString);
-            lastStyle[0] = style;
-            if (str.length() >= minStyledSegmentSize) {
-                var fut = translateAsync(str.toString(), comparable);
-                head.append(Text.literal(wait ? fut.join() : fut.getNow(str.toString())).setStyle(style));
-                str.setLength(0);
+            if (asString.length() < minStyledSegmentSize) {
+                str.append(asString);
+            } else {
+                if (!str.isEmpty()) {
+                    var fut = translateAsync(str.toString(), comparable);
+                    head.append(Text.literal(wait ? fut.join() : fut.getNow(str.toString())).setStyle(lastStyle[0]));
+                    str.setLength(0);
+                }
+                var fut = translateAsync(asString, comparable);
+                head.append(Text.literal(wait ? fut.join() : fut.getNow(asString)).setStyle(style));
             }
+            lastStyle[0] = style;
             return Optional.empty();
         }, text.getStyle());
         if (!str.isEmpty()) {
             var fut = translateAsync(str.toString(), comparable);
             head.append(Text.literal(wait ? fut.join() : fut.getNow(str.toString())).setStyle(lastStyle[0]));
         }
-        return head;
+        return head.getSiblings().size() == 1 ? head.getSiblings().get(0) : head;
     }
 
     public static CompletableFuture<String> translateAsync(String text, Consumer<String> comparable) {
