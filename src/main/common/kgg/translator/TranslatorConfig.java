@@ -1,6 +1,7 @@
 package kgg.translator;
 
 import com.google.gson.*;
+import kgg.translator.handler.TranslateHelper;
 import kgg.translator.option.Option;
 import kgg.translator.util.ConfigUtil;
 import org.apache.logging.log4j.LogManager;
@@ -53,6 +54,8 @@ public class TranslatorConfig {
         config.addProperty("to", TranslatorManager.getTo());
 
         config.addProperty("current", TranslatorManager.getCurrent().getName());
+        config.addProperty("secondary", TranslatorManager.getSecondary().getName());
+        config.addProperty("minStyledSegmentSize", TranslateHelper.getMinStyledSegmentSize());
         TranslatorManager.getTranslators().forEach(translator -> {
             if (translator.isConfigured()) {
                 JsonObject object = new JsonObject();
@@ -69,6 +72,8 @@ public class TranslatorConfig {
             TranslatorManager.setTo(config.get("to").getAsString());
 
             String currentTranslator = config.get("current").getAsString();
+            String secondaryTranslator = config.get("secondary").getAsString();
+            TranslateHelper.setMinStyledSegmentSize(config.get("minStyledSegmentSize").getAsInt());
             TranslatorManager.getTranslators().forEach(translator -> {
                 JsonElement element = config.get(translator.getName());
                 if (element != null) {
@@ -81,6 +86,9 @@ public class TranslatorConfig {
                 }
 
                 if (translator.getName().equals(currentTranslator)) {
+                    TranslatorManager.setTranslator(translator);
+                }
+                if (translator.getName().equals(secondaryTranslator)) {
                     TranslatorManager.setTranslator(translator);
                 }
             });
