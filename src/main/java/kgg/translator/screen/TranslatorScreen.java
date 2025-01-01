@@ -7,7 +7,7 @@ import kgg.translator.TranslatorManager;
 import kgg.translator.handler.TranslateHelper;
 import kgg.translator.modmenu.ModMenuConfigurable;
 import kgg.translator.translator.Translator;
-import kgg.translator.util.LanguageLocalizer;
+import kgg.translator.util.LanguageUtil;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
@@ -81,14 +81,14 @@ public class TranslatorScreen {
             }
         available_languages_no_auto.remove("auto");
         category.addEntry(entryBuilder.startDropdownMenu(Text.translatable("translator.translation.source"),
-                        TranslatorManager.getFrom(), LanguageLocalizer::getLanguageCodeFromName, c -> Text.literal(LanguageLocalizer.getLanguageNameFromCode(c)),
-                        DropdownMenuBuilder.CellCreatorBuilder.of(c -> Text.literal(LanguageLocalizer.getLanguageNameFromCode(c))))
+                        TranslatorManager.getFrom(), LanguageUtil::getLanguageCodeFromName, c -> Text.literal(LanguageUtil.getLanguageNameFromCode(c)),
+                        DropdownMenuBuilder.CellCreatorBuilder.of(c -> Text.literal(LanguageUtil.getLanguageNameFromCode(c))))
                 .setSelections(available_languages)
                 .setErrorSupplier(c -> available_languages.contains(c) ? Optional.empty() : Optional.of(Text.translatable("translator.translation.does_not_exist")))
                 .setDefaultValue("").setSaveConsumer(TranslatorManager::setFrom).build());
         category.addEntry(entryBuilder.startDropdownMenu(Text.translatable("translator.translation.target"),
-                        TranslatorManager.getTo(), LanguageLocalizer::getLanguageCodeFromName, c -> Text.literal(LanguageLocalizer.getLanguageNameFromCode(c)),
-                        DropdownMenuBuilder.CellCreatorBuilder.of(c -> Text.literal(LanguageLocalizer.getLanguageNameFromCode(c))))
+                        TranslatorManager.getTo(), LanguageUtil::getLanguageCodeFromName, c -> Text.literal(LanguageUtil.getLanguageNameFromCode(c)),
+                        DropdownMenuBuilder.CellCreatorBuilder.of(c -> Text.literal(LanguageUtil.getLanguageNameFromCode(c))))
                 .setSelections(available_languages_no_auto)
                 .setErrorSupplier(c -> available_languages_no_auto.contains(c) ? Optional.empty() : Optional.of(Text.translatable("translator.translation.does_not_exist")))
                 .setDefaultValue("").setSaveConsumer(TranslatorManager::setTo).build());

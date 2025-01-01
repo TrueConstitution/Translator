@@ -8,7 +8,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import kgg.translator.TranslatorManager;
 import kgg.translator.util.EasyProperties;
-import kgg.translator.util.LanguageLocalizer;
+import kgg.translator.util.LanguageUtil;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.command.CommandSource;
 
@@ -25,7 +25,7 @@ public class LangArgumentType implements ArgumentType<String> {
     }
 
     public static String getLanguage(CommandContext<FabricClientCommandSource> context, String name) {
-        String string = LanguageLocalizer.getLanguageCodeFromName(context.getArgument(name, String.class));
+        String string = LanguageUtil.getLanguageCodeFromName(context.getArgument(name, String.class));
         EasyProperties properties = TranslatorManager.getCurrent().getLanguageProperties();
         if (!properties.containsKey(string)) return string;
         String lang = properties.getProperty(string);
@@ -38,7 +38,7 @@ public class LangArgumentType implements ArgumentType<String> {
         if (context.getSource() instanceof CommandSource) {
             EasyProperties properties = TranslatorManager.getCurrent().getLanguageProperties();
             if (properties == null) return Suggestions.empty();
-            return CommandSource.suggestMatching(properties.keySet().stream().map(c -> '"' + LanguageLocalizer.getLanguageNameFromCode((String) c) + '"').toList(), builder);
+            return CommandSource.suggestMatching(properties.keySet().stream().map(c -> '"' + LanguageUtil.getLanguageNameFromCode((String) c) + '"').toList(), builder);
         }
         return Suggestions.empty();
     }

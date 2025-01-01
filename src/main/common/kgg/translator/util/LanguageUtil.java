@@ -6,7 +6,7 @@ import net.minecraft.text.Text;
 import java.util.HashMap;
 import java.util.Locale;
 
-public class LanguageLocalizer {
+public class LanguageUtil {
     private static final HashMap<String, String> NAMES_TO_CODE = new HashMap<>();
 
     private static Locale createLocaleFromCode(String languageCode) {
